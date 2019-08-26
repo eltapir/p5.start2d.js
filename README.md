@@ -4,7 +4,7 @@
 
 ---
 
-## p5.start2d.js v0.1.0
+## p5.start2d.js
 
 p5.start2d.js is an extension to ease the creation of 2D STatic ART with p5.js.
 With p5.start2d.js you can use pixels (px), millimeters (mm), centimeters (cm) and
