@@ -1,9 +1,3 @@
-## WORK IN PROGRESS
-
-**This is in early alpha stage. Things can/will break in later versions.**
-
----
-
 ## p5.start2d.js
 
 p5.start2d.js is an extension to ease the creation of 2D STatic ART with p5.js.
