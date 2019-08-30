@@ -7,7 +7,7 @@ Just add the file p5.start2d.js to your html file and you are good to go.
 
 ## Before using this extension, keep in mind that :
 * It is created to use as a quick boilerplate to create generative art which has to be exported.
-* It is not meant to use in web development (lack of cross browser compatibility).
+* It is not meant to use in web development (lack of cross browser compatibility / only tested in latest chrome).
 * I tried to keep it simple to use; No fuss with bundlers or complex setups. Just copy the folder,
 change artwork.js and generate some amazing artwork, print the artwork, sell it for lots of money,
 do something good with the money and start over again...
@@ -58,7 +58,7 @@ function setup() {
         // array with width and height
         // numbers => [297, 210]
         // unit strings => ['11.0in', '25cm']
-        // constant => paperSize.A4 (see p5.papersize.js for possible values)
+        // constant => paperSize.A4 (see source for possible values)
         // default: [297, 210]
         size: [297, 210],
 
@@ -148,7 +148,7 @@ function draw() {
 
 ### For a working example, see the files :
 * `index.html`
-* `artwork.js`
+* `artwork.js` or `artwork-inst.js`
 
 ---
 
