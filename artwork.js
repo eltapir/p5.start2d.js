@@ -1,12 +1,12 @@
 function setup() {
-
+    
     createCanvas({
 
         // size: paperSize.A4,
         // size: ['297', '210'],
         // size: ['297mm', '210mm'],
         // size: ['8.268in', '11.693in'],
-        // size: ['29.7cm', '21cm'],
+        size: ['29.7cm', '21cm'],
         
         orientation: 'landscape',
         units: 'mm',
@@ -14,8 +14,6 @@ function setup() {
 
         // *** the above size parameters, all have the same result.
         // *** ==> canvas of size 297mm by 210mm @ 300 dpi
-
-        size: [400, 118],
 
         backgroundImage: './wallpaper.png',
 
@@ -26,8 +24,8 @@ function setup() {
         outputFileNamePrefix: '@date',
         outputFileNameSuffix: '@seed',
 
+        screenPPI: 96,
         screenPadding: '1cm'
-
     });
 
     // testing
@@ -89,7 +87,7 @@ function __draw() {
     line(width / 3 + 8, height / 2, width, height / 2);
     drawArrow('right');
     noStroke();
-    text(`${round(width)}${units} @ ${ppi}ppi => ${pixelWidth}px`, width / 2, height / 2 - 5);
+    text(`${round(width)}${units} @ ${ppi}ppi => ${pixelWidth}px :: ${window.devicePixelRatio}`, width / 2 + 10, height / 2 - 5);
     
     stroke(0);
     drawArrow('top');

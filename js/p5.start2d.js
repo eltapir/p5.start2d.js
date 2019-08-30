@@ -126,7 +126,7 @@ function _splitCssValue(cssValue) {
     return { cssValue: arr[0], value: arr[1], units: arr[2] };
 }
 
-function _toUnits(value, units = 'px', resolution = 96) {
+function _toUnits(value, units, resolution) {
 
     const unitTable = {
 
@@ -239,13 +239,13 @@ p5.prototype._initUnitScale = function () {
     } else {
         this._uMult = 1;
     }
-
+    
     // TODO: test with (U)HD monitor
-    this._unitScale = this._uMult; // * window.devicePixelRatio; // ?????
-
+    this._unitScale = this._uMult; // * window.devicePixelRatio;
+    
     this._pxWidth = Math.round(this._uWidth * this._uMult);
     this._pxHeight = Math.round(this._uHeight * this._uMult);
-    this._pxScreenPadding = Math.round(_toUnits(this._screenPadding, 'px', this._screenPPI));
+    this._pxScreenPadding = Math.round(_toUnits(this._screenPadding, 'px', this._cssScreenPPI));
 }
 
 p5.prototype._initPanZoom = function () {
@@ -256,14 +256,14 @@ p5.prototype._initPanZoom = function () {
     const kw = (awWidth - 2 * this._pxScreenPadding) / this._pxWidth;
     const kh = (awHeight - 2 * this._pxScreenPadding) / this._pxHeight;
 
-    this._minZoomScaled = Math.min(this._minZoom, this._minZoom / this._ppi * this._screenPPI);
-    this._maxZoomScaled = Math.min(this._maxZoom, this._maxZoom / this._ppi * this._screenPPI);
+    this._minZoomScaled = Math.min(this._minZoom, this._minZoom / this._ppi * this._cssScreenPPI);
+    this._maxZoomScaled = Math.min(this._maxZoom, this._maxZoom / this._ppi * this._cssScreenPPI);
 
     this._fitZoom = Math.min(this._maxZoomScaled, Math.min(kw, kh));
     this._minZoomCurrent = this._fitZoom < this._minZoomScaled ? this._fitZoom : this._minZoomCurrent;
 
     // *** fit if canvas is larger then window. if smaller stay at zoom 1 (one)
-    this._fitZoom = Math.min(1 / this._ppi * this._screenPPI, this._fitZoom);
+    this._fitZoom = Math.min(1 / this._ppi * this._cssScreenPPI, this._fitZoom);
 
     // *** always fit; enlarge if canvas is smaller then window
     // this._maxZoomScaled = Math.max(this._maxZoomScaled, this._fitZoom);
@@ -477,7 +477,7 @@ p5.prototype._onKeyUp = function (ev) {
     // Zoom to scale (1)
     if (ev.key == '1') {
 
-        this._zoom = 1 / this._ppi * this._screenPPI;
+        this._zoom = 1 / this._ppi * this._cssScreenPPI;
         this._zoomInOut();
     }
 
@@ -529,7 +529,7 @@ p5.prototype._initShadow = function () {
 
 p5.prototype._drawShadow = function () {
 
-    const scale = this._ppi / this._screenPPI;
+    const scale = this._ppi / this._cssScreenPPI;
 
     const u = this._units;
     const sX = this._shadowX * this._zoom * scale;
@@ -687,6 +687,10 @@ p5.prototype.createCanvas = function (props = {}) {
         this._units = this._props.units;
         this._ppi = this._props.ppi;
 
+        // TODO: test with (U)HD monitor
+        this._cssScreenPPI = this._props.screenPPI / window.devicePixelRatio;
+        this._screenPadding = this._props.screenPadding;
+
         this._uWidth = _toUnits(this._props.size[0], this._units, this._ppi);
         this._uHeight = _toUnits(this._props.size[1], this._units, this._ppi);
 
@@ -713,9 +717,6 @@ p5.prototype.createCanvas = function (props = {}) {
 
         this._rndr = props.renderer === null ? this.P2D : props.renderer;
 
-        this._screenPadding = _toUnits(this._props.screenPadding);
-        this._screenPPI = this._props.screenPPI;
-
         this._minZoom = this._props.minZoom;
         this._minZoomCurrent = this._minZoom;
         this._maxZoom = this._props.maxZoom;
@@ -724,9 +725,9 @@ p5.prototype.createCanvas = function (props = {}) {
         this._shadowVisible = !!this._props.shadowVisible;
         this._shadowColor = this._props.shadowColor;
 
-        this._shadowX = _toUnits(this._props.shadowX, this._units, this._screenPPI);
-        this._shadowY = _toUnits(this._props.shadowY, this._units, this._screenPPI);
-        this._shadowBlur = _toUnits(this._props.shadowBlur, this._units, this._screenPPI);
+        this._shadowX = _toUnits(this._props.shadowX, this._units, this._cssScreenPPI);
+        this._shadowY = _toUnits(this._props.shadowY, this._units, this._cssScreenPPI);
+        this._shadowBlur = _toUnits(this._props.shadowBlur, this._units, this._cssScreenPPI);
 
         this._seed = this._props.seed;
         this._noiseSeed = this._seed;
@@ -765,14 +766,12 @@ p5.prototype.createCanvas = function (props = {}) {
 
         // -------------------------------------------------------------------------------------
 
-        // this._aw = _createArtworkParent(this._props.artworkParent, this._props.artworkID);
         this._aw = _createArtworkParent();
 
         _setBackground(this._aw, this._backgroundImage, this._backgroundColor);
 
         if (!this._seed) {
 
-            // default to 4 digit seed ( 1000 - 9999 )
             this._seed = Math.floor(Math.random() * (10000 - 1000) + 1000);
         }
 
