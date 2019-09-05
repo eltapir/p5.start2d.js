@@ -5,7 +5,9 @@ With p5.start2d.js you can use pixels (px), millimeters (mm), centimeters (cm) a
 inches (in). Panning and zooming is also available together with easy PNG file export.
 Just add the file p5.start2d.js to your html file and you are good to go.
 
-![example] (example-export.png "Example export")
+<p align="center">
+    <img src="example-export.png" style="margin: 3em 0 2em;">
+</p>
 
 ## Before using this extension, keep in mind that :
 * It is created to use as a quick boilerplate to create generative art which has to be exported.
