@@ -36,7 +36,7 @@
 // CONSTANTS
 // -------------------------------------------------------------------------------------------------
 
-const VERSION = '0.1.0';
+const VERSION = '0.2.0';
 
 const ARTWORK_DEFAULTS = {
 
@@ -89,12 +89,6 @@ function _removeComments(el) {
             n.parentNode.removeChild(n);
         }
     }
-}
-
-function _removeAllComments() {
-
-    _removeComments(document.head);
-    _removeComments(document.body);
 }
 
 function _splitCssValue(cssValue) {
@@ -151,7 +145,8 @@ function _createArtworkParent() {
 
     let firstChild;
 
-    _removeAllComments();
+    _removeComments(document.head);
+    _removeComments(document.body);
 
     firstChild = document.body.childNodes[0];
 
@@ -444,7 +439,7 @@ p5.prototype._onKeyUp = function (ev) {
         this.save(full);
     }
 
-    // Zoom to (F)it
+    // Zoom to (F)it in window
     if (ev.key == 'f' || ev.key == 'F') {
 
         this._zoom = this._fitZoom;
