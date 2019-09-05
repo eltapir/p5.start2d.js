@@ -6,12 +6,13 @@ inches (in). Panning and zooming is also available together with easy PNG file e
 Just add the file p5.start2d.js to your html file and you are good to go.
 
 <p align="center">
-    <img src="example-export.png" style="margin: 3em 0 2em;">
+    <img src="./assets/example-export.png" style="margin: 3em 0 2em;">
 </p>
 
 ## Before using this extension, keep in mind that :
 * It is created to use as a quick boilerplate to create generative art which has to be exported.
 * It is not meant to use in web development (lack of cross browser compatibility / only tested in latest chrome).
+* Only 2D sketches are supported
 * I tried to keep it simple to use; No fuss with bundlers or complex setups. Just copy the folder,
 change artwork.js and generate some amazing artwork, print the artwork, sell it for lots of money,
 do something good with the money and start over again...
@@ -40,16 +41,6 @@ do something good with the money and start over again...
 
 - In `createCanvas()`,  Instead of providing `width` and `height` you have to provide an object (see example)
 - `noLoop()` is the default, since the main purpose of this addon is to create static art.
-
----
-
-### CONVERTING PNG TO PDF
-
-To convert PNG files to PDF files I use `imagemagick` (cross platform : linux, mac, win, ...)
-
-`$ convert -quality 100 -density 300 artwork.png artwork.pdf`
-
-( the density is the resolution/ppi used in your createCanvas parameters )
 
 ---
 
@@ -153,6 +144,16 @@ function draw() {
 ### For a working example, see the files :
 * `index.html`
 * `artwork.js` or `artwork-inst.js`
+
+---
+
+### CONVERTING PNG TO PDF
+
+To convert PNG files to PDF files I use `imagemagick` (cross platform : linux, mac, win, ...)
+
+`$ convert -quality 100 -density 300 artwork.png artwork.pdf`
+
+( the density is the resolution/ppi used in your createCanvas parameters )
 
 ---
 

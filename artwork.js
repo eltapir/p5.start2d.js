@@ -6,7 +6,7 @@ function setup() {
         // size: ['297', '210'],
         // size: ['297mm', '210mm'],
         // size: ['8.268in', '11.693in'],
-        // size: ['29.7cm', '21cm'],
+        size: ['29.7cm', '21cm'],
         
         orientation: 'landscape',
         units: 'mm',
@@ -15,7 +15,7 @@ function setup() {
         // *** the above size parameters, all have the same result.
         // *** ==> canvas of size 297mm by 210mm @ 300 dpi
 
-        backgroundImage: './wallpaper.png',
+        backgroundImage: './assets/wallpaper.png',
 
         maxZoom: 2.0,
         minZoom: 0.1,
@@ -33,11 +33,11 @@ function setup() {
 
     background(255);
 
-    // !!!!! SCALING IS NOT READY YET IN SETUP FUNCTION            !!!!!
-    // !!!!! SEE RED DIAGONAL LINE DRAWN IN SETUP VS DRAWN IN DRAW !!!!!
+    // !!!!! SCALING IS NOT READY YET IN SETUP FUNCTION          !!!!!
+    // !!!!! SEE RED DIAGONAL LINE IN SETUP VS GREY LINE IN DRAW !!!!!
     stroke(255, 0, 0);
     diagonal();
-    // !!!!! ----------------------------------------------------- !!!!!
+    // !!!!! --------------------------------------------------- !!!!!
 }
 
 function diagonal() {
@@ -48,11 +48,11 @@ function diagonal() {
 
 function draw() {
     
-    // !!!!! SCALING IS CORRECT IN DRAW FUNCTION                    !!!!!
-    // !!!!! SEE GREY DIAGONAL LINE DRAWN IN SETUP VS DRAWN IN DRAW !!!!!
+    // !!!!! SCALING IS CORRECT IN DRAW FUNCTION                 !!!!!
+    // !!!!! SEE RED DIAGONAL LINE IN SETUP VS GREY LINE IN DRAW !!!!!
     stroke(0, 50);
     diagonal();
-    // !!!!! ------------------------------------------------------ !!!!!
+    // !!!!! --------------------------------------------------- !!!!!
 
     strokeWeight(1);
     noFill();
