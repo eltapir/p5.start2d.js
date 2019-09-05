@@ -10,6 +10,23 @@
 
         <title>P5.js Boilerplate</title>
 
+        <style>
+
+            *, ::before, ::after { box-sizing: inherit; margin: 0; padding: 0; }
+            html { box-sizing: border-box; }
+            html, body { height: 100%; overflow: hidden; width: 100%; }
+            canvas { display: block; font-size: 0; }
+            .artwork { overflow: hidden; height: 100%; position: relative; width: 100%; }
+            .canvas { position: absolute; background-color: #fff; }
+            .xy-display {
+                border-radius: 1rem; color: #222; text-align: center; font-family: monospace;
+                font-size: 0.8rem; padding: 0.25rem 0.5rem; bottom: 0.5rem; left: 50%;
+                position: absolute; background: rgba(255, 255, 255, 0.5);
+                transform: translateX(-50%);
+            }
+        
+        </style>
+
         <!-- p5 cdn -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/p5.min.js" defer></script>
         <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js" defer></script> -->

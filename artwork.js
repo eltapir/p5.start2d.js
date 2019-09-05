@@ -2,11 +2,11 @@ function setup() {
     
     createCanvas({
 
-        // size: paperSize.A4,
+        // size: paperSize.a4,
         // size: ['297', '210'],
         // size: ['297mm', '210mm'],
         // size: ['8.268in', '11.693in'],
-        size: ['29.7cm', '21cm'],
+        // size: ['29.7cm', '21cm'],
         
         orientation: 'landscape',
         units: 'mm',
@@ -41,13 +41,13 @@ function setup() {
 }
 
 function diagonal() {
-
+    
     strokeWeight(10);
     line(0, 0, width, height);
 }
 
 function draw() {
-
+    
     // !!!!! SCALING IS CORRECT IN DRAW FUNCTION                    !!!!!
     // !!!!! SEE GREY DIAGONAL LINE DRAWN IN SETUP VS DRAWN IN DRAW !!!!!
     stroke(0, 50);

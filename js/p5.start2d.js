@@ -76,32 +76,9 @@ const ARTWORK_DEFAULTS = {
     noiseSeed: null
 }
 
-const STYLES = '*, ::before, ::after { box-sizing: inherit; margin: 0; padding: 0; }\n' +
-               'html { box-sizing: border-box; }\n' +
-               'html, body { width: 100%; height: 100%; overflow: hidden; }\n' +
-               'canvas { display: block; font-size: 0; }\n' +
-               '.artwork { overflow: hidden; height: 100%; position: relative; width: 100%; }\n' +
-               '.canvas { position: absolute; background-color: #fff; }\n' +
-               '.xy-display {\n' +
-               '    position: absolute; background: rgba(255, 255, 255, 0.5);\n' +
-               '    border-radius: 1rem; color: #222; text-align: center; font-family: mono;\n' +
-               '    font-size: 0.8rem; padding: 0.25rem 0.5rem; bottom: 0.5rem; left: 50%;\n' +
-               '    transform: translateX(-50%);\n' +
-               '}';
-
 
 // PRIVATE FUNCTIONS
 // -------------------------------------------------------------------------------------------------
-
-function _addStyles(cssAsString) {
-
-    const style = document.createElement('style');
-    const firstScript = document.querySelector('script');
-
-    style.innerHTML = cssAsString;
-
-    firstScript.parentNode.insertBefore(style, firstScript);
-}
 
 function _removeComments(el) {
 
@@ -607,8 +584,6 @@ p5.prototype._setGlobalWidthAndHeight = function () {
 
 p5.prototype.paperSize = {
 
-    '4A0': ['1682mm', '2378mm'],
-    '2A0': ['1189mm', '1682mm'],
     'A0': ['841mm', '1189mm'],
     'A1': ['594mm', '841mm'],
     'A2': ['420mm', '594mm'],
@@ -681,8 +656,6 @@ p5.prototype.createCanvas = function (props = {}) {
         this._props = { ...ARTWORK_DEFAULTS, ...props };
 
         this._p5StartMode = true;
-
-        _addStyles(STYLES);
 
         this._units = this._props.units;
         this._ppi = this._props.ppi;
