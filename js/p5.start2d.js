@@ -563,12 +563,12 @@ p5.prototype._generateFileNameAddition = function (arg) {
 
 p5.prototype._setGlobalWidthAndHeight = function () {
 
-    window.width = this._uWidth;
-    window.height = this._uHeight;
-    window.pixelWidth = this._pxWidth;
-    window.pixelHeight = this._pxHeight;
-    window.units = this._units;
-    window.ppi = this._ppi;
+    this._ctx.width = this._uWidth;
+    this._ctx.height = this._uHeight;
+    this._ctx.pixelWidth = this._pxWidth;
+    this._ctx.pixelHeight = this._pxHeight;
+    this._ctx.units = this._units;
+    this._ctx.ppi = this._ppi;
 }
 
 
@@ -642,6 +642,8 @@ p5.prototype.createCanvas = function (props = {}) {
 
     let cvs;
 
+    this._ctx = this._isGlobal ? window : this;
+    
     this._p5StartMode = false;
 
     if (typeof props === 'object') {
