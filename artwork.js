@@ -70,6 +70,8 @@ function draw() {
 
     __draw();
 
+    stroke(0, 255, 0, 100);
+    line(0, height, width, 0);
 }
 
 function __draw() {
@@ -95,9 +97,11 @@ function __draw() {
     drawArrow('bottom');
     noStroke();
 
+    push();
     translate(width / 3, height / 2);
     rotate(PI * 1.5);
     text(`${round(height)}${units} @ ${ppi}ppi => ${pixelHeight}px`, 0, - 5);
+    pop();
 }
 
 function drawArrow(dir) {

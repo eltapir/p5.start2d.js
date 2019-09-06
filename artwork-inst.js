@@ -65,10 +65,10 @@ const artwork = new p5((aw) => {
             aw.circle(cx, cy, r);
         }
 
-        console.log(aw.width);
-
         __draw();
 
+        aw.stroke(0, 255, 0, 100);
+        aw.line(0, aw.height, aw.width, 0);
     }
 
     const diagonal = () => {
@@ -100,9 +100,11 @@ const artwork = new p5((aw) => {
         drawArrow('bottom');
         aw.noStroke();
 
+        aw.push();
         aw.translate(aw.width / 3, aw.height / 2);
         aw.rotate(aw.PI * 1.5);
         aw.text(`${aw.round(aw.height)}${aw.units} @ ${aw.ppi}ppi => ${aw.pixelHeight}px`, 0, - 5);
+        aw.pop();
     }
 
     const drawArrow = (dir) => {
