@@ -743,7 +743,16 @@ p5.prototype.createCanvas = function (props = {}) {
         if (!this._seed) {
 
             this._seed = Math.floor(Math.random() * (10000 - 1000) + 1000);
+            this._noiseSeed = this._seed;
         }
+
+        if (!this._noiseSeed) {
+
+            this._noiseSeed = this._seed;
+        }
+
+        this.randomSeed(this._seed);
+        this.noiseSeed(this._noiseSeed);
 
         this._initUnitScale();
 
