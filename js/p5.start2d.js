@@ -668,7 +668,15 @@ p5.prototype.createCanvas = function (props = {}) {
 
         // TODO: test with (U)HD monitor
         this._cssScreenPPI = this._props.screenPPI / window.devicePixelRatio;
-        this._screenPadding = this._props.screenPadding;
+
+        if (typeof this._props.screenPadding === 'number') {
+
+            this._screenPadding = this._props.screenPadding + this._units;
+
+        } else {
+
+            this._screenPadding = this._props.screenPadding;
+        }
 
         this._uWidth = _toUnits(this._props.size[0], this._units, this._ppi);
         this._uHeight = _toUnits(this._props.size[1], this._units, this._ppi);
@@ -703,7 +711,6 @@ p5.prototype.createCanvas = function (props = {}) {
 
         this._shadowVisible = !!this._props.shadowVisible;
         this._shadowColor = this._props.shadowColor;
-
         this._shadowX = _toUnits(this._props.shadowX, this._units, this._cssScreenPPI);
         this._shadowY = _toUnits(this._props.shadowY, this._units, this._cssScreenPPI);
         this._shadowBlur = _toUnits(this._props.shadowBlur, this._units, this._cssScreenPPI);
