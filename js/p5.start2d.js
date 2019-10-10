@@ -80,13 +80,23 @@ const ARTWORK_DEFAULTS = {
 // PRIVATE FUNCTIONS
 // -------------------------------------------------------------------------------------------------
 
-function _removeComments(el) {
+function _removeComments(node) {
 
-    for (let n of el.childNodes) {
+    // ORIGINAL SOURCE:
+    // https://www.sitepoint.com/removing-useless-nodes-from-the-dom/
 
-        if (n.nodeName === '#comment') {
+    for (let n = 0; n < node.childNodes.length; n++) {
 
-            n.parentNode.removeChild(n);
+        let child = node.childNodes[n];
+
+        if (child.nodeType === Node.COMMENT_NODE) {
+
+            node.removeChild(child);
+            n--;
+
+        } else if (child.nodeType === 1) {
+
+            _removeComments(child);
         }
     }
 }
@@ -145,8 +155,7 @@ function _createArtworkParent() {
 
     let firstChild;
 
-    _removeComments(document.head);
-    _removeComments(document.body);
+    _removeComments(document.documentElement);
 
     firstChild = document.body.childNodes[0];
 
