@@ -2,7 +2,7 @@ function setup() {
     
     createCanvas({
 
-        // size: paperSize.a4,
+        // size: paperSize.A4,
         // size: ['297', '210'],
         // size: ['297mm', '210mm'],
         // size: ['8.268in', '11.693in'],
@@ -26,6 +26,7 @@ function setup() {
 
         screenPPI: 96,
         screenPadding: '1cm'
+
     });
 
     // testing
