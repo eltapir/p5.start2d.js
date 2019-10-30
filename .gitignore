@@ -1,2 +1,5 @@
+.gitignore
 node_modules
 package-lock.json
+zindex.html
+zartwork.js
