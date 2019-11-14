@@ -49,7 +49,6 @@ function setup() {
         // array with width and height as
         //   - numbers => [297, 210]
         //   - unit strings => ['11.6929in', '21.00cm']
-        // constant => paperSize.A4 (see source for possible values)
         // string => 'A4' (see source for possible values - A0, A1, LETTER, ANSIA, ...)
         // default: [297, 210]
         size: [297, 210],

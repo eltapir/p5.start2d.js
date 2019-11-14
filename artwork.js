@@ -2,7 +2,6 @@ function setup() {
     
     createCanvas({
 
-        // size: paperSize.A4,
         // size: ['297', '210'],
         // size: ['297mm', '210mm'],
         // size: ['8.268in', '11.693in'],
