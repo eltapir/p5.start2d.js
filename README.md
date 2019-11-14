@@ -55,7 +55,7 @@ function setup() {
 
         // orientation
         // 'portrait'  => height = biggest parameter from size
-        // 'landscape' => height = smallest parameter from 
+        // 'landscape' => height = smallest parameter from size
         // default: 'unchanged'
         orientation: 'portrait',
 
