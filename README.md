@@ -3,19 +3,15 @@
 p5.start2d.js is an extension to ease the creation of 2D STatic ART with p5.js.
 With p5.start2d.js you can use pixels (px), millimeters (mm), centimeters (cm) and
 inches (in). Panning and zooming is also available together with easy PNG file export.
-Just add the file p5.start2d.js to your html file and you are good to go.
+Just include p5 and p5.start2d.js in your html file and you are good to go.
 
 <p align="center">
     <img src="./assets/example-export.png" style="margin: 3em 0 2em;">
 </p>
 
 ## Before using this extension, keep in mind that :
-* It is created to use as a quick boilerplate to create generative art which has to be exported.
-* It is not meant to use in web development (lack of cross browser compatibility / only tested in latest chrome).
-* Only 2D sketches are supported
-* I tried to keep it simple to use; No fuss with bundlers or complex setups. Just copy the folder,
-change artwork.js and generate some amazing artwork, print the artwork, sell it for lots of money,
-do something good with the money and start over again...
+* It is created to use as a quick boilerplate for the creation of sketches which has to be exported.
+* It is only tested in latest chrome / firefox.
 * If p5.js didn't exist I wood never have written this extension.
 
 ---
@@ -50,10 +46,11 @@ function setup() {
 
     createCanvas({
 
-        // array with width and height
-        // numbers => [297, 210]
-        // unit strings => ['11.0in', '25cm']
+        // array with width and height as
+        //   - numbers => [297, 210]
+        //   - unit strings => ['11.6929in', '21.00cm']
         // constant => paperSize.A4 (see source for possible values)
+        // string => 'A4' (see source for possible values - A0, A1, LETTER, ANSIA, ...)
         // default: [297, 210]
         size: [297, 210],
 

@@ -678,6 +678,19 @@ p5.prototype.createCanvas = function (props = {}) {
             this._screenPadding = this._props.screenPadding;
         }
 
+        if (typeof this._props.size === 'string') {
+
+            if (this._props.size.toUpperCase() in this.paperSize) {
+
+                this._props.size = this.paperSize[this._props.size.toUpperCase()];
+
+            } else {
+
+                console.log(`# WARNING #\ninvalid paper size. Set to default ${ARTWORK_DEFAULTS.size}\n\n`)
+                this._props.size = ARTWORK_DEFAULTS.size;
+            }
+        }
+
         this._uWidth = _toUnits(this._props.size[0], this._units, this._ppi);
         this._uHeight = _toUnits(this._props.size[1], this._units, this._ppi);
 

@@ -6,7 +6,8 @@ function setup() {
         // size: ['297', '210'],
         // size: ['297mm', '210mm'],
         // size: ['8.268in', '11.693in'],
-        size: ['29.7cm', '21cm'],
+        // size: ['29.7cm', '21cm'],
+        size: 'A4',
         
         orientation: 'landscape',
         units: 'mm',
