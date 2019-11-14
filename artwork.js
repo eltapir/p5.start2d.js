@@ -34,26 +34,25 @@ function setup() {
 
     background(255);
 
-    // !!!!! SCALING IS NOT READY YET IN SETUP FUNCTION          !!!!!
-    // !!!!! SEE RED DIAGONAL LINE IN SETUP VS GREY LINE IN DRAW !!!!!
-    stroke(255, 0, 0);
+    // !!!!! TEST SCALING IN SETUP & DRAW   !!!!!
+    strokeWeight(10);
+    stroke(255, 0, 0, 100);
     diagonal();
-    // !!!!! --------------------------------------------------- !!!!!
+    // !!!!! ------------------------------ !!!!!
 }
 
 function diagonal() {
     
-    strokeWeight(10);
-    line(0, 0, width, height);
+    line(width * 0.5, height * 0.5, width * 0.75, height * 0.75);
 }
 
 function draw() {
     
-    // !!!!! SCALING IS CORRECT IN DRAW FUNCTION                 !!!!!
-    // !!!!! SEE RED DIAGONAL LINE IN SETUP VS GREY LINE IN DRAW !!!!!
-    stroke(0, 50);
+    // !!!!! TEST SCALING IN SETUP & DRAW   !!!!!
+    strokeWeight(1);
+    stroke(0, 100);
     diagonal();
-    // !!!!! --------------------------------------------------- !!!!!
+    // !!!!! ------------------------------ !!!!!
 
     strokeWeight(1);
     noFill();
@@ -70,9 +69,6 @@ function draw() {
     }
 
     __draw();
-
-    stroke(0, 255, 0, 100);
-    line(0, height, width, 0);
 }
 
 function __draw() {

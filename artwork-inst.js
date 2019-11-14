@@ -32,24 +32,24 @@ const artwork = new p5((aw) => {
         });
 
         // testing
-        // aw.resizeCanvas(300, 150);
+        aw.resizeCanvas(300, 150);
 
         aw.background(255);
 
-        // !!!!! SCALING IS NOT READY YET IN SETUP FUNCTION            !!!!!
-        // !!!!! SEE RED DIAGONAL LINE DRAWN IN SETUP VS DRAWN IN DRAW !!!!!
-        aw.stroke(255, 0, 0);
+        // !!!!! TEST SCALING IN SETUP & DRAW   !!!!!
+        aw.strokeWeight(10);
+        aw.stroke(255, 0, 0, 100);
         diagonal();
-        // !!!!! ----------------------------------------------------- !!!!!
+        // !!!!! ------------------------------ !!!!!
     }
 
     aw.draw = () => {
 
-        // !!!!! SCALING IS CORRECT IN DRAW FUNCTION                    !!!!!
-        // !!!!! SEE GREY DIAGONAL LINE DRAWN IN SETUP VS DRAWN IN DRAW !!!!!
+        // !!!!! TEST SCALING IN SETUP & DRAW   !!!!!
+        aw.strokeWeight(1);
         aw.stroke(0, 50);
         diagonal();
-        // !!!!! ------------------------------------------------------ !!!!!
+        // !!!!! ------------------------------ !!!!!
 
         aw.strokeWeight(1);
         aw.noFill();
@@ -66,15 +66,11 @@ const artwork = new p5((aw) => {
         }
 
         __draw();
-
-        aw.stroke(0, 255, 0, 100);
-        aw.line(0, aw.height, aw.width, 0);
     }
 
     const diagonal = () => {
 
-        aw.strokeWeight(10);
-        aw.line(0, 0, aw.width, aw.height);
+        aw.line(aw.width * 0.5, aw.height * 0.5, aw.width * 0.75, aw.height * 0.75);
     }
 
     const __draw = () => {

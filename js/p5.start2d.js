@@ -790,6 +790,9 @@ p5.prototype.createCanvas = function (props = {}) {
 
         this._setGlobalWidthAndHeight();
 
+        // TODO : test this in setup()
+        this.drawingContext.scale(this._unitScale, this._unitScale);
+
         console.log(`width: ${this._uWidth}${this._units} ` +
             `/ height: ${this._uHeight}${this._units} / ppi: ${this._ppi}`);
 
@@ -827,9 +830,12 @@ p5.prototype.resizeCanvas = function (w, h, noRedraw) {
 
         this.__resizeCanvas(this._pxWidth, this._pxHeight, noRedraw);
 
-        this._setGlobalWidthAndHeight();
-
         this._initPanZoom();
+        
+        this._setGlobalWidthAndHeight();
+        
+        // TODO : test this in setup()
+        this.drawingContext.scale(this._unitScale, this._unitScale);
 
         console.log(`width: ${this._uWidth}${this._units} ` +
             `/ height: ${this._uHeight}${this._units} / ppi: ${this._ppi}`);
