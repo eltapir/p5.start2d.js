@@ -805,7 +805,8 @@ p5.prototype.createCanvas = function (props = {}) {
         this.drawingContext.scale(this._unitScale, this._unitScale);
 
         console.log(`width: ${this._uWidth}${this._units} ` +
-            `/ height: ${this._uHeight}${this._units} / ppi: ${this._ppi}`);
+            `/ height: ${this._uHeight}${this._units} ` +
+            `/ ppi: ${this._ppi} / seed: ${this._seed}`);
 
     } else {
 
@@ -849,7 +850,8 @@ p5.prototype.resizeCanvas = function (w, h, noRedraw) {
         this.drawingContext.scale(this._unitScale, this._unitScale);
 
         console.log(`width: ${this._uWidth}${this._units} ` +
-            `/ height: ${this._uHeight}${this._units} / ppi: ${this._ppi}`);
+            `/ height: ${this._uHeight}${this._units} ` +
+            `/ ppi: ${this._ppi} / seed: ${this._seed}`);
 
     } else {
 
