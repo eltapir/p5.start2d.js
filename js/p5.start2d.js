@@ -911,3 +911,44 @@ p5.prototype.noiseSeed = function (seed) {
     }
 }
 
+p5.prototype.startTimer = function () {
+
+    if (!this._startTm) {
+
+        this._startTm = parseInt(performance.now());
+    }
+}
+
+p5.prototype.stopTimer = function () {
+
+    const msToTime = function (millis) {
+
+        let m = '' + Math.floor(millis % 1000) + '';
+        let S = '' + Math.floor((millis / 1000) % 60);
+        let M = '' + Math.floor((millis / (1000 * 60)) % 60);
+        let H = '' + Math.floor((millis / (1000 * 60 * 60)) % 24);
+
+        m = m.padStart(3, '0');
+        S = S.padStart(2, '0');
+        M = M.padStart(2, '0');
+        H = H.padStart(2, '0');
+
+        return H + ':' + M + ':' + S + '.' + m;
+    }
+
+    if (this._startTm) {
+
+        let ms = parseInt(performance.now()) - this._startTm;
+
+        console.log('~'.repeat(40));
+        console.log('Duration (ms)    :'.padEnd(18), ('' + ms).padStart(12) + ' ms');
+        console.log('Duration (HMS.m) :'.padEnd(18), (msToTime(ms)).padStart(12) + ' h');
+        console.log('~'.repeat(40), '\n\n');
+
+        this._startTm = null;
+
+    } else {
+
+        console.log('You have to use startTimer() before stopTimer()');
+    }
+}
