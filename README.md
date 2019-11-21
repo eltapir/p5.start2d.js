@@ -40,7 +40,8 @@ Just include p5 and p5.start2d.js in your html file and you are good to go.
 
 ---
 
-### EXAMPLE
+### EXAMPLE ([see with p5 editor](https://editor.p5js.org/KheO/present/O1ExxgATT "p5.start2d.js boilerplate"))
+
 ```JS
 function setup() {
 
