@@ -34,9 +34,9 @@
 
 
 // CONSTANTS
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
-const VERSION = '0.2.0';
+const VERSION = '0.3.0';
 
 const ARTWORK_DEFAULTS = {
 
@@ -63,8 +63,8 @@ const ARTWORK_DEFAULTS = {
     outputFileName: 'artwork',     // output file name
     outputFileNamePrefix: '@seed', // prefix and suffix :
     outputFileNameSuffix: '@date', // @seed gives current seed value - @date gives date & time
-                                   //       seed  title    date    time
-                                   // ex. : 7521-artwork-20190513-161132
+    //       seed  title    date    time
+    // ex. : 7521-artwork-20190513-161132
 
     xyDisplayDecimals: 2, // number of decimals for mouse cooordinates display
 
@@ -134,7 +134,7 @@ const PAPER_SIZE = {
 }
 
 // PRIVATE FUNCTIONS
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
 function _removeComments(node) {
 
@@ -263,7 +263,7 @@ function _getElementPosition(el) {
 
 
 // PRIVATE EXTENSIONS
-// -------------------------------------------------------------------------------------------------
+// =================================================================================================
 
 p5.prototype._initUnitScale = function () {
 
@@ -276,10 +276,10 @@ p5.prototype._initUnitScale = function () {
     } else {
         this._uMult = 1;
     }
-    
+
     // TODO: test with (U)HD monitor
     this._unitScale = this._uMult; // * window.devicePixelRatio;
-    
+
     this._pxWidth = Math.round(this._uWidth * this._uMult);
     this._pxHeight = Math.round(this._uHeight * this._uMult);
     this._pxScreenPadding = Math.round(_toUnits(this._screenPadding, 'px', this._cssScreenPPI));
@@ -342,7 +342,7 @@ p5.prototype._initListeners = function () {
 
     const waitForFinalEvent = (() => {
 
-        // SOURCE CODE:
+        // ORIGINAL SOURCE :
         // https://gist.github.com/mazell/289e13ccf01759fcb921
 
         let timers = {};
@@ -638,8 +638,7 @@ p5.prototype._setGlobalWidthAndHeight = function () {
 
 
 // PUBLIC EXTENSIONS
-// -------------------------------------------------------------------------------------------------
-
+// =================================================================================================
 
 // createCanvas
 
@@ -650,7 +649,7 @@ p5.prototype.createCanvas = function (props = {}) {
     let cvs;
 
     this._ctx = this._isGlobal ? window : this;
-    
+
     this._p5StartMode = false;
 
     if (typeof props === 'object') {
@@ -843,9 +842,9 @@ p5.prototype.resizeCanvas = function (w, h, noRedraw) {
         this.__resizeCanvas(this._pxWidth, this._pxHeight, noRedraw);
 
         this._initPanZoom();
-        
+
         this._setGlobalWidthAndHeight();
-        
+
         // TODO : test this in setup()
         this.drawingContext.scale(this._unitScale, this._unitScale);
 
@@ -910,6 +909,8 @@ p5.prototype.noiseSeed = function (seed) {
         this._noiseSeed = seed;
     }
 }
+
+// timer
 
 p5.prototype.startTimer = function () {
 

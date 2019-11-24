@@ -143,4 +143,3 @@ function drawArrow(dir) {
 
     pop();
 }
-
