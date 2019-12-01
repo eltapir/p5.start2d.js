@@ -1,7 +1,7 @@
 
 /* ********************************************************************************************** */
 /*                                                                                                */
-/* Copyright (C) 2019, Kris HEYSE                                                                 */
+/* Copyright (C) 2019-2020, Kris HEYSE                                                            */
 /*                                                                                                */
 /* This library is free software; you can redistribute it and/or                                  */
 /* modify it under the terms of the GNU Lesser General Public                                     */
@@ -63,8 +63,8 @@ const ARTWORK_DEFAULTS = {
     outputFileName: 'artwork',     // output file name
     outputFileNamePrefix: '@seed', // prefix and suffix :
     outputFileNameSuffix: '@date', // @seed gives current seed value - @date gives date & time
-    //       seed  title    date    time
-    // ex. : 7521-artwork-20190513-161132
+                                   //       seed  title    date    time
+                                   // ex. : 7521-artwork-20190513-161132
 
     xyDisplayDecimals: 2, // number of decimals for mouse cooordinates display
 
