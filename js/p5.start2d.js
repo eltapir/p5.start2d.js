@@ -626,14 +626,21 @@ p5.prototype._generateFileNameAddition = function (arg) {
     return retVal;
 }
 
-p5.prototype._setGlobalWidthAndHeight = function () {
+p5.prototype._setGlobalProperties = function () {
 
-    this._ctx.width = this._uWidth;
-    this._ctx.height = this._uHeight;
-    this._ctx.pixelWidth = this._pxWidth;
-    this._ctx.pixelHeight = this._pxHeight;
-    this._ctx.units = this._units;
-    this._ctx.ppi = this._ppi;
+    this._setProperty('width', this._uWidth);
+    this._setProperty('height', this._uHeight);
+    this._setProperty('pixelWidth', this._pxWidth);
+    this._setProperty('pixelHeight', this._pxHeight);
+    this._setProperty('units', this._units);
+    this._setProperty('ppi', this._ppi);
+
+    // this._ctx.width = this._uWidth;
+    // this._ctx.height = this._uHeight;
+    // this._ctx.pixelWidth = this._pxWidth;
+    // this._ctx.pixelHeight = this._pxHeight;
+    // this._ctx.units = this._units;
+    // this._ctx.ppi = this._ppi;
 }
 
 
@@ -798,7 +805,7 @@ p5.prototype.createCanvas = function (props = {}) {
 
         this.noLoop();
 
-        this._setGlobalWidthAndHeight();
+        this._setGlobalProperties();
 
         // TODO : test this in setup()
         this.drawingContext.scale(this._unitScale, this._unitScale);
@@ -843,7 +850,7 @@ p5.prototype.resizeCanvas = function (w, h, noRedraw) {
 
         this._initPanZoom();
 
-        this._setGlobalWidthAndHeight();
+        this._setGlobalProperties();
 
         // TODO : test this in setup()
         this.drawingContext.scale(this._unitScale, this._unitScale);
@@ -876,7 +883,7 @@ p5.prototype.resetMatrix = function () {
             this.drawingContext.scale(this._unitScale, this._unitScale);
         }
 
-        this._setGlobalWidthAndHeight();
+        this._setGlobalProperties();
     }
 }
 
