@@ -30,7 +30,7 @@ function setup() {
     });
 
     // testing
-    // resizeCanvas(300, 150);
+    resizeCanvas(300, 200);
 
     background(255);
 

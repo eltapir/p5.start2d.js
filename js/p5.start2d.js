@@ -641,6 +641,7 @@ p5.prototype._setGlobalProperties = function () {
     // this._ctx.pixelHeight = this._pxHeight;
     // this._ctx.units = this._units;
     // this._ctx.ppi = this._ppi;
+    
 }
 
 

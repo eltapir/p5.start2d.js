@@ -32,7 +32,7 @@ const artwork = new p5((aw) => {
         });
 
         // testing
-        // aw.resizeCanvas(300, 150);
+        aw.resizeCanvas(300, 200);
 
         aw.background(255);
 
