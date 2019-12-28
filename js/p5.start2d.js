@@ -1,4 +1,3 @@
-
 /* ********************************************************************************************** */
 /*                                                                                                */
 /* Copyright (C) 2019-2020, Kris HEYSE                                                            */
@@ -36,7 +35,7 @@
 // CONSTANTS
 // =================================================================================================
 
-const VERSION = '0.3.0';
+const VERSION = '0.3.1';
 
 const ARTWORK_DEFAULTS = {
 
@@ -634,14 +633,6 @@ p5.prototype._setGlobalProperties = function () {
     this._setProperty('pixelHeight', this._pxHeight);
     this._setProperty('units', this._units);
     this._setProperty('ppi', this._ppi);
-
-    // this._ctx.width = this._uWidth;
-    // this._ctx.height = this._uHeight;
-    // this._ctx.pixelWidth = this._pxWidth;
-    // this._ctx.pixelHeight = this._pxHeight;
-    // this._ctx.units = this._units;
-    // this._ctx.ppi = this._ppi;
-    
 }
 
 
