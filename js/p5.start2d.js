@@ -44,7 +44,7 @@ const ARTWORK_DEFAULTS = {
                        // string: 'A4', 'A2', 'LETTER', 'ANSIA', ...
     orientation: null, // string: 'portrait', 'landscape' or null
     units: 'mm',       // string: px, mm, cm, in
-    ppi: 300,          // number: output/export resolution (pixels per inch)
+    exportPPI: 300,          // number: output/export resolution (pixels per inch)
 
     maxZoom: 2.0,   // number: maximum zoom
     minZoom: 0.2,   // number: minimum zoom => can change to fit sketch on screen
@@ -161,7 +161,7 @@ p5.prototype.createCanvas = function (props = {}) {
         this._p5StartMode = true;
 
         this._units = this._props.units;
-        this._ppi = this._props.ppi;
+        this._exportPPI = this._props.exportPPI;
 
         // TODO: test with (U)HD monitor
         this._dpr = Math.ceil(window.devicePixelRatio) || 1;
@@ -189,8 +189,8 @@ p5.prototype.createCanvas = function (props = {}) {
             }
         }
 
-        this._uWidth = this._toUnits(this._props.size[0], this._units, this._ppi);
-        this._uHeight = this._toUnits(this._props.size[1], this._units, this._ppi);
+        this._uWidth = this._toUnits(this._props.size[0], this._units, this._exportPPI);
+        this._uHeight = this._toUnits(this._props.size[1], this._units, this._exportPPI);
 
         this._orientation = this._props.orientation;
 
@@ -304,7 +304,7 @@ p5.prototype.createCanvas = function (props = {}) {
 
         console.log(`width: ${this._uWidth}${this._units} ` +
             `/ height: ${this._uHeight}${this._units} ` +
-            `/ ppi: ${this._ppi} / seed: ${this._seed}`);
+            `/ exportPPI: ${this._exportPPI} / seed: ${this._seed}`);
 
     } else {
 
@@ -349,7 +349,7 @@ p5.prototype.resizeCanvas = function (w, h, noRedraw) {
 
         console.log(`width: ${this._uWidth}${this._units} ` +
             `/ height: ${this._uHeight}${this._units} ` +
-            `/ ppi: ${this._ppi} / seed: ${this._seed}`);
+            `/ exportPPI: ${this._exportPPI} / seed: ${this._seed}`);
 
     } else {
 
@@ -575,11 +575,11 @@ p5.prototype._setWallpaper = function() {
 p5.prototype._initUnitScale = function () {
 
     if (this._units === 'mm') {
-        this._uMult = this._ppi / 25.4;
+        this._uMult = this._exportPPI / 25.4;
     } else if (this._units === 'cm') {
-        this._uMult = this._ppi / 2.54;
+        this._uMult = this._exportPPI / 2.54;
     } else if (this._units === 'in') {
-        this._uMult = this._ppi;
+        this._uMult = this._exportPPI;
     } else {
         this._uMult = 1;
     }
@@ -599,14 +599,14 @@ p5.prototype._initPanZoom = function () {
     const kw = (awWidth - 2 * this._pxScreenPadding) / this._pxWidth;
     const kh = (awHeight - 2 * this._pxScreenPadding) / this._pxHeight;
 
-    this._minZoomScaled = Math.min(this._minZoom, this._minZoom / this._ppi * this._cssScreenPPI);
-    this._maxZoomScaled = Math.min(this._maxZoom, this._maxZoom / this._ppi * this._cssScreenPPI);
+    this._minZoomScaled = Math.min(this._minZoom, this._minZoom / this._exportPPI * this._cssScreenPPI);
+    this._maxZoomScaled = Math.min(this._maxZoom, this._maxZoom / this._exportPPI * this._cssScreenPPI);
 
     this._fitZoom = Math.min(this._maxZoomScaled, Math.min(kw, kh));
     this._minZoomCurrent = this._fitZoom < this._minZoomScaled ? this._fitZoom : this._minZoomCurrent;
 
     // *** fit if canvas is larger then window. if smaller stay at zoom 1 (one)
-    this._fitZoom = Math.min(1 / this._ppi * this._cssScreenPPI, this._fitZoom);
+    this._fitZoom = Math.min(1 / this._exportPPI * this._cssScreenPPI, this._fitZoom);
 
     // *** always fit; enlarge if canvas is smaller then window
     // this._maxZoomScaled = Math.max(this._maxZoomScaled, this._fitZoom);
@@ -824,7 +824,7 @@ p5.prototype._onKeyUp = function (ev) {
     // Zoom to scale (1)
     if (ev.key == '1') {
 
-        this._zoom = 1 / this._ppi * this._cssScreenPPI;
+        this._zoom = 1 / this._exportPPI * this._cssScreenPPI;
         this._zoomInOut();
     }
 
@@ -888,7 +888,7 @@ p5.prototype._initShadow = function () {
 
 p5.prototype._drawShadow = function () {
 
-    const scale = this._ppi / this._cssScreenPPI;
+    const scale = this._exportPPI / this._cssScreenPPI;
 
     const u = this._units;
     const sX = this._shadowX * this._zoom * scale;
@@ -918,5 +918,5 @@ p5.prototype._setGlobalProperties = function () {
     this._setProperty('pixelWidth', this._pxWidth);
     this._setProperty('pixelHeight', this._pxHeight);
     this._setProperty('units', this._units);
-    this._setProperty('ppi', this._ppi);
+    this._setProperty('exportPPI', this._exportPPI);
 }

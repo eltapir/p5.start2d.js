@@ -10,7 +10,7 @@ function setup() {
         
         orientation: 'landscape',
         units: 'mm',
-        ppi: 300,
+        exportPPI: 300,
 
         // *** the above size parameters, all have the same result.
         // *** ==> canvas of size 297mm by 210mm @ 300 dpi
@@ -86,7 +86,7 @@ function __draw() {
     line(width / 3 + 8, height / 2, width, height / 2);
     drawArrow('right');
     noStroke();
-    text(`${round(width)}${units} @ ${ppi}ppi => ${pixelWidth}px :: ${window.devicePixelRatio}`, width / 2 + 10, height / 2 - 5);
+    text(`${round(width)}${units} @ ${exportPPI}ppi => ${pixelWidth}px :: ${window.devicePixelRatio}`, width / 2 + 10, height / 2 - 5);
     
     stroke(0);
     drawArrow('top');
@@ -97,7 +97,7 @@ function __draw() {
     push();
     translate(width / 3, height / 2);
     rotate(PI * 1.5);
-    text(`${round(height)}${units} @ ${ppi}ppi => ${pixelHeight}px`, 0, - 5);
+    text(`${round(height)}${units} @ ${exportPPI}ppi => ${pixelHeight}px`, 0, - 5);
     pop();
 }
 

@@ -12,7 +12,7 @@ const artwork = new p5((aw) => {
 
             orientation: 'landscape',
             units: 'mm',
-            ppi: 300,
+            exportPPI: 300,
 
             // *** the above size parameters, all have the same result.
             // *** ==> canvas of size 297mm by 210mm @ 300 dpi
@@ -88,7 +88,7 @@ const artwork = new p5((aw) => {
         aw.line(aw.width / 3 + 8, aw.height / 2, aw.width, aw.height / 2);
         drawArrow('right');
         aw.noStroke();
-        aw.text(`${aw.round(aw.width)}${aw.units} @ ${aw.ppi}ppi => ${aw.pixelWidth}px`, aw.width / 2, aw.height / 2 - 5);
+        aw.text(`${aw.round(aw.width)}${aw.units} @ ${aw.exportPPI}ppi => ${aw.pixelWidth}px :: ${window.devicePixelRatio}`, aw.width / 2 + 10, aw.height / 2 - 5);
 
         aw.stroke(0);
         drawArrow('top');
@@ -99,7 +99,7 @@ const artwork = new p5((aw) => {
         aw.push();
         aw.translate(aw.width / 3, aw.height / 2);
         aw.rotate(aw.PI * 1.5);
-        aw.text(`${aw.round(aw.height)}${aw.units} @ ${aw.ppi}ppi => ${aw.pixelHeight}px`, 0, - 5);
+        aw.text(`${aw.round(aw.height)}${aw.units} @ ${aw.exportPPI}ppi => ${aw.pixelHeight}px`, 0, - 5);
         aw.pop();
     }
 
