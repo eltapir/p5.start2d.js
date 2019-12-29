@@ -2,7 +2,7 @@
 
 p5.start2d.js is an extension to ease the creation of 2D STatic ART with p5.js.
 With p5.start2d.js you can use pixels (px), millimeters (mm), centimeters (cm) and
-inches (in). Panning and zooming is also available together with easy PNG file export.
+inches (in). Panning and zooming is also available, together with easy PNG file export.
 Just include p5 and p5.start2d.js in your html file and you are good to go.
 
 <p align="center">
@@ -40,7 +40,7 @@ Just include p5 and p5.start2d.js in your html file and you are good to go.
 
 ---
 
-### EXAMPLE ([see with p5 editor](https://editor.p5js.org/KheO/present/O1ExxgATT "p5.start2d.js boilerplate"))
+### EXAMPLE ([see with p5 editor](https://editor.p5js.org/ElTapir/present/qaPA21W51 "p5.start2d.js boilerplate"))
 
 ```JS
 function setup() {
@@ -66,8 +66,7 @@ function setup() {
         // default: 'mm'
         units: 'mm',
 
-        // output resolution (exporting canvas to file)
-        // ie. 96 for screen (100 on my laptop), 144 HiDef screen, 300+ for printing, ...
+        // output resolution (ie. exporting canvas to file)
         // default : 300
         ppi: 300,
 
@@ -76,8 +75,8 @@ function setup() {
         maxZoom: 2.0,
 
         // minimum zoom => can change to fit on screen
-        // default : 0.2
-        minZoom: 0.2,
+        // default : 0.1
+        minZoom: 0.1,
 
         // zoom step size
         // default 0.025
@@ -104,23 +103,18 @@ function setup() {
         // unit value (string : ex. '0.4in')
         shadowBlur: '10mm',
         
-        // wallpaper color
+        // wallpaper color (body)
         // default : '#dddddd'
-        backgroundColor: '#ddddde',
+        wallpaperColor: '#808080',
         
         // output file name
-        // default : 'artwork'
-        outputFileName: 'artwork',
+        outputFileName: 'artwork-@date-@seed',
 
-        // output file name prefix and suffix
-        // @seed gives current seed value
         // @date gives date & time
+        // @seed gives current seed value
         //
-        //       seed  title    date    time
-        // ex. : 7521-artwork-20190513-161132
-        // 
-        outputFileNamePrefix: '@seed',
-        outputFileNameSuffix: '@date',
+        //        title    date    time  seed
+        // ex. : artwork-20191231-191030-1234
         
         // number of decimals when showing mouse coordinates
         // default: 2

@@ -17,15 +17,15 @@ const artwork = new p5((aw) => {
             // *** the above size parameters, all have the same result.
             // *** ==> canvas of size 297mm by 210mm @ 300 dpi
 
-            backgroundImage: './assets/wallpaper.png',
+            wallpaperImage: './assets/wallpaper.png',
 
             maxZoom: 2.0,
             minZoom: 0.1,
 
-            outputFileName: 'Artwork',
-            outputFileNamePrefix: '@date',
-            outputFileNameSuffix: '@seed',
+            seed: 1234,
 
+            outputFileName: 'Artwork-@date-@seed',
+    
             screenPPI: 96,
             screenPadding: '1cm'
 

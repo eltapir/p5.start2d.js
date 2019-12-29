@@ -19,13 +19,13 @@
 
 /* ********************************************************************************************** */
 /*                                                                                                */
-/* p5.js Extension                                                                                */
+/*   p5.js Extension                                                                              */
 /*                                                                                                */
-/* - Adds use of mm, cm and inches, instead of pixels                                             */
-/* - Adds panning and zooming                                                                     */
-/* - Adds easier export to png file                                                               */
+/* - Use of mm, cm and inches, instead of pixels                                                  */
+/* - Panning and zooming                                                                          */
+/* - Easy export to png file                                                                      */
 /*                                                                                                */
-/* Author  : Kris HEYSE                                                                           */
+/*   Author  : Kris HEYSE                                                                         */
 /*                                                                                                */
 /* ********************************************************************************************** */
 
@@ -35,41 +35,45 @@
 // CONSTANTS
 // =================================================================================================
 
-const VERSION = '0.3.1';
+const VERSION = '0.4.0';
 
 const ARTWORK_DEFAULTS = {
 
-    size: [297, 210],        // array with width/height as numbers or as strings ('100mm')
-    orientation: 'nochange', // nochange, portrait, landscape
-    units: 'mm',             // px, mm, cm, in
-    ppi: 300,                // output/export resolution (pixels per inch)
+    size: [297, 210],  // array of numbers: ['297mm', '210mm']
+                       // array of numbers: [297, 210]
+                       // string: 'A4', 'A2', 'LETTER', 'ANSIA', ...
+    orientation: null, // string: 'portrait', 'landscape' or null
+    units: 'mm',       // string: px, mm, cm, in
+    ppi: 300,          // number: output/export resolution (pixels per inch)
 
-    maxZoom: 2.0,   // maximum zoom
-    minZoom: 0.2,   // minimum zoom => can change to fit on screen
-    zoomInc: 0.025, // zoom / scroll step size
+    maxZoom: 2.0,   // number: maximum zoom
+    minZoom: 0.2,   // number: minimum zoom => can change to fit sketch on screen
+    zoomInc: 0.025, // number: zoom / scroll step size
 
-    screenPadding: '10mm', // space between artwork and window/screen border
-    screenPPI: 96,         // screen resolution
+    screenPadding: '10mm', // string: space between artwork and window/screen border
+                           // number: value in units
+    screenPPI: 96,         // number: screen resolution
 
-    shadowVisible: true,                  // shadow visible
-    shadowColor: 'rgba(64, 64, 64, 0.5)', // shadow color
-    shadowX: '0mm',                       // unit value (string : ex. '1cm')
-    shadowY: '6mm',                       // unit value (string : ex. '10mm')
-    shadowBlur: '10mm',                   // unit value (string : ex. '0.4in')
+    shadowVisible: true,                  // bool: shadow visible
+    shadowColor: 'rgba(64, 64, 64, 0.5)', // string: shadow color
+    shadowX: '0mm',                       // string|number: unit value (ex. '1cm' or 1)
+    shadowY: '6mm',                       // string|number: unit value (ex. '10mm' or 10)
+    shadowBlur: '10mm',                   // string|number: unit value (ex. '0.4in')
 
-    backgroundColor: '#808080', // body/wallpaper color
+    wallpaperColor: '#808080', // string: body/wallpaper color
 
-    outputFileName: 'artwork',     // output file name
-    outputFileNamePrefix: '@seed', // prefix and suffix :
-    outputFileNameSuffix: '@date', // @seed gives current seed value - @date gives date & time
-                                   //       seed  title    date    time
-                                   // ex. : 7521-artwork-20190513-161132
+    outputFileName: 'artwork-@date-@seed', // string: output file name
+                                           // @seed == current seed value
+                                           // @date == date & time
+                                           // ex.: @seed-artwork-@date  
+                                           // =>   seed  name     date    time
+                                           // =>   7521-artwork-20190513-161132
 
-    xyDisplayDecimals: 2, // number of decimals for mouse cooordinates display
+    xyDisplayDecimals: 2, // number: number of decimals for mouse cooordinates display
 
     // -----------------------------------------------------------------------------------------
 
-    backgroundImage: null,
+    wallpaperImage: null,
     renderer: null,
     seed: null,
     noiseSeed: null
@@ -132,511 +136,8 @@ const PAPER_SIZE = {
     'ARCHE1': ['30.0in', '42.0in']
 }
 
-// PRIVATE FUNCTIONS
-// =================================================================================================
 
-function _removeComments(node) {
-
-    // ORIGINAL SOURCE:
-    // https://www.sitepoint.com/removing-useless-nodes-from-the-dom/
-
-    for (let n = 0; n < node.childNodes.length; n++) {
-
-        let child = node.childNodes[n];
-
-        if (child.nodeType === Node.COMMENT_NODE) {
-
-            node.removeChild(child);
-            n--;
-
-        } else if (child.nodeType === 1) {
-
-            _removeComments(child);
-        }
-    }
-}
-
-function _splitCssValue(cssValue) {
-
-    const arr = cssValue.match(/^([+-]?(?:\d+|\d*\.\d+))([a-z]*|%)$/);
-    return { cssValue: arr[0], value: arr[1], units: arr[2] };
-}
-
-function _toUnits(value, units, resolution) {
-
-    const unitTable = {
-
-        'mm': {
-            'mm': 1.00,
-            'cm': 10.0,
-            'in': 25.4,
-            'px': 25.4 / resolution
-        },
-
-        'cm': {
-            'mm': 0.10,
-            'cm': 1.00,
-            'in': 2.54,
-            'px': 2.54 / resolution
-        },
-
-        'in': {
-            'mm': 1.00 / 25.4,
-            'cm': 1.00 / 2.54,
-            'in': 1.00,
-            'px': 1.00 / resolution
-        },
-
-        'px': {
-            'mm': resolution / 25.4,
-            'cm': resolution / 2.54,
-            'in': resolution,
-            'px': 1.00
-        }
-    }
-
-    const cssVal = typeof value === 'number' ? value + units : value;
-    const valObject = _splitCssValue(cssVal);
-
-    return valObject.value * unitTable[units][valObject.units === '' ? units : valObject.units];
-}
-
-
-function _createArtworkParent() {
-
-    const comment1 = document.createComment(' Added by p5.start2d.js ');
-    const aw = document.createElement('div');
-    const comment2 = document.createComment(' ---------------------- ');
-
-    let firstChild;
-
-    _removeComments(document.documentElement);
-
-    firstChild = document.body.childNodes[0];
-
-    aw.id = 'artwork';
-    aw.classList.add('artwork');
-
-    document.body.insertBefore(comment1, firstChild);
-    document.body.insertBefore(aw, firstChild);
-    document.body.insertBefore(comment2, firstChild);
-
-    return aw;
-}
-
-function _setBackground(aw, bgi, bgc) {
-
-    if (bgi) {
-
-        const img = new Image();
-
-        img.addEventListener('load', (ev) => {
-
-            aw.style.background = `url(${img.src})`;
-
-        }, { once: true });
-
-        img.addEventListener('error', (err) => {
-
-            console.log(`ERROR : Background image "${img.src}" not found`);
-            aw.style.background = bgc;
-
-        }, { once: true });
-
-        img.src = bgi;
-
-    } else {
-
-        aw.style.background = bgc;
-    }
-}
-
-function _getElementPosition(el) {
-
-    let elDim = window.getComputedStyle(el);
-    let elX = parseFloat(elDim.getPropertyValue('left'));
-    let elY = parseFloat(elDim.getPropertyValue('top'));
-
-    return { x: elX, y: elY };
-}
-
-
-// PRIVATE EXTENSIONS
-// =================================================================================================
-
-p5.prototype._initUnitScale = function () {
-
-    if (this._units === 'mm') {
-        this._uMult = this._ppi / 25.4;
-    } else if (this._units === 'cm') {
-        this._uMult = this._ppi / 2.54;
-    } else if (this._units === 'in') {
-        this._uMult = this._ppi;
-    } else {
-        this._uMult = 1;
-    }
-
-    // TODO: test with (U)HD monitor
-    this._unitScale = this._uMult; // * window.devicePixelRatio;
-
-    this._pxWidth = Math.round(this._uWidth * this._uMult);
-    this._pxHeight = Math.round(this._uHeight * this._uMult);
-    this._pxScreenPadding = Math.round(_toUnits(this._screenPadding, 'px', this._cssScreenPPI));
-}
-
-p5.prototype._initPanZoom = function () {
-
-    const awWidth = this.canvas.parentNode.offsetWidth;
-    const awHeight = this.canvas.parentNode.offsetHeight;
-
-    const kw = (awWidth - 2 * this._pxScreenPadding) / this._pxWidth;
-    const kh = (awHeight - 2 * this._pxScreenPadding) / this._pxHeight;
-
-    this._minZoomScaled = Math.min(this._minZoom, this._minZoom / this._ppi * this._cssScreenPPI);
-    this._maxZoomScaled = Math.min(this._maxZoom, this._maxZoom / this._ppi * this._cssScreenPPI);
-
-    this._fitZoom = Math.min(this._maxZoomScaled, Math.min(kw, kh));
-    this._minZoomCurrent = this._fitZoom < this._minZoomScaled ? this._fitZoom : this._minZoomCurrent;
-
-    // *** fit if canvas is larger then window. if smaller stay at zoom 1 (one)
-    this._fitZoom = Math.min(1 / this._ppi * this._cssScreenPPI, this._fitZoom);
-
-    // *** always fit; enlarge if canvas is smaller then window
-    // this._maxZoomScaled = Math.max(this._maxZoomScaled, this._fitZoom);
-
-    this._zoom = this._fitZoom;
-
-    this._scaleArtwork();
-    this._positionArtwork();
-}
-
-p5.prototype._scaleArtwork = function () {
-
-    this.canvas.style.width = this._pxWidth * this._zoom + 'px';
-    this.canvas.style.height = this._pxHeight * this._zoom + 'px';
-
-    if (this._shadowVisible) {
-
-        this._drawShadow();
-    }
-}
-
-p5.prototype._positionArtwork = function (left, top) {
-
-    const cvsStyle = this.canvas.style;
-
-    if (!(left || top)) {
-
-        cvsStyle.left = (this._aw.offsetWidth - this._pxWidth * this._zoom) / 2 + 'px';
-        cvsStyle.top = (this._aw.offsetHeight - this._pxHeight * this._zoom) / 2 + 'px';
-
-    } else {
-
-        cvsStyle.left = left + 'px';
-        cvsStyle.top = top + 'px';
-    }
-}
-
-p5.prototype._initListeners = function () {
-
-    const waitForFinalEvent = (() => {
-
-        // ORIGINAL SOURCE :
-        // https://gist.github.com/mazell/289e13ccf01759fcb921
-
-        let timers = {};
-
-        return function (callback, ms, uniqueId) {
-            if (!uniqueId) { uniqueId = 'Don\'t call this twice without a uniqueId'; }
-            if (timers[uniqueId]) { clearTimeout(timers[uniqueId]); }
-            timers[uniqueId] = setTimeout(callback, ms);
-        };
-
-    })();
-
-    window.addEventListener('resize', (ev) => {
-
-        waitForFinalEvent(this._onFinalWindowResize.bind(this), 200, 'unique resize key');
-    });
-
-    this.canvas.addEventListener('mousemove', this._onMouseMove.bind(this));
-    this.canvas.addEventListener('mousedown', this._onMouseDown.bind(this));
-    this.canvas.addEventListener('mouseup', this._onMouseUpOrLeave.bind(this));
-    this.canvas.addEventListener('wheel', this._onMouseWheel.bind(this));
-
-    document.addEventListener('keyup', this._onKeyUp.bind(this));
-}
-
-p5.prototype._onFinalWindowResize = function (ev) {
-
-    this._initPanZoom();
-}
-
-p5.prototype._displayCoordinates = function () {
-
-    this._xyDisplay.innerHTML =
-        `${this._mouseX.toFixed(this._dispDec)}${this._units} / ` +
-        `${this._mouseY.toFixed(this._dispDec)}${this._units}`;
-}
-
-p5.prototype._onMouseMove = function (ev) {
-
-    let cvsDim = window.getComputedStyle(this.canvas);
-    let cvsX = parseFloat(cvsDim.getPropertyValue('left'));
-    let cvsY = parseFloat(cvsDim.getPropertyValue('top'));
-
-    let cvsW = parseFloat(cvsDim.getPropertyValue('width'));
-    let cvsScale = this._pxWidth / cvsW;
-
-    this._mouseX = (ev.clientX - cvsX) * cvsScale / this._uMult;
-    this._mouseY = (ev.clientY - cvsY) * cvsScale / this._uMult;
-
-    if (this._xyDisplay.style.display === 'block') {
-
-        this._displayCoordinates();
-    }
-}
-
-p5.prototype._onMouseDown = function (ev) {
-
-    this._mouseDown = true;
-
-    this._cvsStartPos = _getElementPosition(this.canvas);
-    this._mouseStartDragX = ev.clientX;
-    this._mouseStartDragY = ev.clientY;
-
-    this.canvas.addEventListener('mousemove', this._onMouseDragged.bind(this));
-    this.canvas.addEventListener('mouseleave', this._onMouseUpOrLeave.bind(this));
-}
-
-p5.prototype._onMouseDragged = function (ev) {
-
-    if (this._mouseDown === true) {
-
-        let left = this._cvsStartPos.x + (ev.clientX - this._mouseStartDragX);
-        let top = this._cvsStartPos.y + (ev.clientY - this._mouseStartDragY);
-
-        this._mouseDragging = true;
-
-        this._positionArtwork(left, top);
-    }
-}
-
-p5.prototype._onMouseUpOrLeave = function (ev) {
-
-    if (this._mouseDragging === true) {
-
-        this.canvas.removeEventListener('mousemove', this._onMouseDragged);
-        this.canvas.removeEventListener('mouseleave', this._onMouseUpOrLeave);
-    }
-
-    this._mouseDown = false;
-    this._mouseDragging = false;
-}
-
-p5.prototype._onMouseWheel = function (ev) {
-
-    this._zoomInOut(ev, ev.offsetX, ev.offsetY);
-}
-
-p5.prototype._zoomInOut = function (ev, mX, mY) {
-
-    let cssStyles = window.getComputedStyle(this.canvas);
-    let cvsW = parseFloat(cssStyles.getPropertyValue('width'));
-    let cvsH = parseFloat(cssStyles.getPropertyValue('height'));
-
-    let zoomInc = this._zoomInc;
-    let oldZoom = this._zoom;
-    let pctLeft = mX ? mX / cvsW : undefined;
-    let pctTop = mY ? mY / cvsH : undefined;
-    let pos = _getElementPosition(this.canvas);
-    let newLeft, newTop;
-
-    if (ev) {
-
-        ev.preventDefault();
-
-        if (ev.ctrlKey) {
-            zoomInc *= 2;
-        }
-
-        if (ev.altKey) {
-            zoomInc *= 0.25;
-        }
-
-        if (ev.deltaY > 0) {
-
-            // zoom out
-
-            if (this._zoom > this._minZoomCurrent) {
-
-                this._zoom = Math.max(this._minZoomCurrent, this._zoom - zoomInc);
-            }
-
-        } else if (ev.deltaY < 0) {
-
-            // zoom in
-
-            if (this._zoom < this._maxZoomScaled) {
-
-                this._zoom = Math.min(this._maxZoomScaled, this._zoom + zoomInc);
-            }
-        }
-    }
-
-    this._scaleArtwork();
-
-    newLeft = pos.x + (this._pxWidth * oldZoom - this._pxWidth * this._zoom) * pctLeft;
-    newTop = pos.y + (this._pxHeight * oldZoom - this._pxHeight * this._zoom) * pctTop;
-    this._positionArtwork(newLeft, newTop);
-}
-
-p5.prototype._onKeyUp = function (ev) {
-
-    // Export drawing to PNG
-    if (ev.key == 'e' || ev.key == 'E') {
-
-        let pref = this._generateFileNameAddition(this._outputFileNamePrefix);
-        let suff = this._generateFileNameAddition(this._outputFileNameSuffix);
-        let full = (pref ? pref + '-' : '') + this._outputFileName + (suff ? '-' + suff : '');
-
-        this.save(full);
-    }
-
-    // Zoom to (F)it in window
-    if (ev.key == 'f' || ev.key == 'F') {
-
-        this._zoom = this._fitZoom;
-        this._zoomInOut();
-    }
-
-    // Zoom to scale (1)
-    if (ev.key == '1') {
-
-        this._zoom = 1 / this._ppi * this._cssScreenPPI;
-        this._zoomInOut();
-    }
-
-    // Zoom to (M)aximum scale
-    if (ev.key == 'm' || ev.key == 'M') {
-
-        this._zoom = this._maxZoomScaled;
-        this._zoomInOut();
-    }
-
-    // toggle mouse position display
-    if (ev.key == 'd' || ev.key == 'D') {
-
-        if (this._xyDisplay.style.display === 'none') {
-
-            this._xyDisplay.style.display = 'block';
-            this._displayCoordinates();
-
-        } else {
-
-            this._xyDisplay.style.display = 'none';
-        }
-    }
-
-    // toggle shadow visibility
-    if (ev.key === 's' || ev.key === 'S') {
-
-
-        if (this._shadowVisible === true) {
-
-            this._clearShadow();
-            this._shadowVisible = false;
-
-        } else {
-
-            this._drawShadow();
-            this._shadowVisible = true;
-        }
-    }
-}
-
-p5.prototype._initShadow = function () {
-
-    if (this._shadowVisible) {
-
-        this._drawShadow();
-    }
-}
-
-p5.prototype._drawShadow = function () {
-
-    const scale = this._ppi / this._cssScreenPPI;
-
-    const u = this._units;
-    const sX = this._shadowX * this._zoom * scale;
-    const sY = this._shadowY * this._zoom * scale;
-    const sBlur = this._shadowBlur * this._zoom * scale;
-
-    this.canvas.style.boxShadow = `${sX}${u} ${sY}${u} ${sBlur}${u} ${this._shadowColor}`;
-}
-
-p5.prototype._clearShadow = function () {
-
-    this.canvas.style.boxShadow = 'none';
-}
-
-p5.prototype._initPositionDisplay = function () {
-
-    this._xyDisplay = document.createElement('div');
-    this._xyDisplay.classList.add('xy-display');
-    this._xyDisplay.style.display = 'none';
-    this._aw.appendChild(this._xyDisplay);
-}
-
-p5.prototype._generateFileNameAddition = function (arg) {
-
-    let retVal = '';
-
-    if (arg) {
-
-        let firstChar = arg.charAt(0);
-
-        if (firstChar === '@') {
-
-            let realArg = arg.substring(1).toLowerCase();
-
-            if (realArg === 'seed') {
-
-                retVal = this._seed;
-
-            } else if (realArg === 'date') {
-
-                let d = new Date();
-
-                retVal = d.getFullYear() +
-                    ('' + (d.getMonth() + 1)).padStart(2, '0') +
-                    ('' + d.getDate()).padStart(2, '0') + '-' +
-                    ('' + d.getHours()).padStart(2, '0') +
-                    ('' + d.getMinutes()).padStart(2, '0') +
-                    ('' + d.getSeconds()).padStart(2, '0');
-            }
-
-        } else {
-
-            retVal = arg;
-        }
-    }
-
-    return retVal;
-}
-
-p5.prototype._setGlobalProperties = function () {
-
-    this._setProperty('width', this._uWidth);
-    this._setProperty('height', this._uHeight);
-    this._setProperty('pixelWidth', this._pxWidth);
-    this._setProperty('pixelHeight', this._pxHeight);
-    this._setProperty('units', this._units);
-    this._setProperty('ppi', this._ppi);
-}
-
-
-// PUBLIC EXTENSIONS
+// PUBLIC METHODS
 // =================================================================================================
 
 // createCanvas
@@ -663,7 +164,8 @@ p5.prototype.createCanvas = function (props = {}) {
         this._ppi = this._props.ppi;
 
         // TODO: test with (U)HD monitor
-        this._cssScreenPPI = this._props.screenPPI / window.devicePixelRatio;
+        this._dpr = Math.ceil(window.devicePixelRatio) || 1;
+        this._cssScreenPPI = this._props.screenPPI / this._dpr;
 
         if (typeof this._props.screenPadding === 'number') {
 
@@ -687,8 +189,8 @@ p5.prototype.createCanvas = function (props = {}) {
             }
         }
 
-        this._uWidth = _toUnits(this._props.size[0], this._units, this._ppi);
-        this._uHeight = _toUnits(this._props.size[1], this._units, this._ppi);
+        this._uWidth = this._toUnits(this._props.size[0], this._units, this._ppi);
+        this._uHeight = this._toUnits(this._props.size[1], this._units, this._ppi);
 
         this._orientation = this._props.orientation;
 
@@ -720,19 +222,17 @@ p5.prototype.createCanvas = function (props = {}) {
 
         this._shadowVisible = !!this._props.shadowVisible;
         this._shadowColor = this._props.shadowColor;
-        this._shadowX = _toUnits(this._props.shadowX, this._units, this._cssScreenPPI);
-        this._shadowY = _toUnits(this._props.shadowY, this._units, this._cssScreenPPI);
-        this._shadowBlur = _toUnits(this._props.shadowBlur, this._units, this._cssScreenPPI);
+        this._shadowX = this._toUnits(this._props.shadowX, this._units, this._cssScreenPPI);
+        this._shadowY = this._toUnits(this._props.shadowY, this._units, this._cssScreenPPI);
+        this._shadowBlur = this._toUnits(this._props.shadowBlur, this._units, this._cssScreenPPI);
 
         this._seed = this._props.seed || Math.floor(Math.random() * (10000 - 1000) + 1000);
         this._noiseSeed = this._props.noiseSeed || this._seed;
 
-        this._backgroundColor = this._props.backgroundColor;
-        this._backgroundImage = this._props.backgroundImage;
+        this._wallpaperColor = this._props.wallpaperColor;
+        this._wallpaperImage = this._props.wallpaperImage;
 
         this._outputFileName = this._props.outputFileName;
-        this._outputFileNamePrefix = this._props.outputFileNamePrefix;
-        this._outputFileNameSuffix = this._props.outputFileNameSuffix;
 
         this._dispDec = this._props.xyDisplayDecimals;
 
@@ -761,9 +261,9 @@ p5.prototype.createCanvas = function (props = {}) {
 
         // -------------------------------------------------------------------------------------
 
-        this._aw = _createArtworkParent();
+        this._aw = this._createArtworkParent();
 
-        _setBackground(this._aw, this._backgroundImage, this._backgroundColor);
+        this._setWallpaper(this._aw, this._wallpaperImage, this._wallpaperColor);
 
         this.randomSeed(this._seed);
         this.noiseSeed(this._noiseSeed);
@@ -951,4 +451,472 @@ p5.prototype.stopTimer = function () {
 
         console.log('You have to use startTimer() before stopTimer()');
     }
+}
+
+
+// PRIVATE METHODS
+// =================================================================================================
+
+p5.prototype._toUnits = function(value, units = 'px', resolution = 96) {
+
+    const unitTable = {
+
+        'mm': {
+            'mm': 1.00,
+            'cm': 10.0,
+            'in': 25.4,
+            'px': 25.4 / resolution
+        },
+
+        'cm': {
+            'mm': 0.10,
+            'cm': 1.00,
+            'in': 2.54,
+            'px': 2.54 / resolution
+        },
+
+        'in': {
+            'mm': 1.00 / 25.4,
+            'cm': 1.00 / 2.54,
+            'in': 1.00,
+            'px': 1.00 / resolution
+        },
+
+        'px': {
+            'mm': resolution / 25.4,
+            'cm': resolution / 2.54,
+            'in': resolution,
+            'px': 1.00
+        }
+    }
+
+    const cssVal = typeof value === 'number' ? value + units : value;
+    const valObject = this._splitCssValue(cssVal);
+
+    return valObject.value * unitTable[units][valObject.units === '' ? units : valObject.units];
+}
+
+p5.prototype._splitCssValue = function(cssValue) {
+
+    const arr = cssValue.match(/^([+-]?(?:\d+|\d*\.\d+))([a-z]*|%)$/);
+    return { cssValue: arr[0], value: arr[1], units: arr[2] };
+}
+
+p5.prototype._createArtworkParent = function() {
+
+    const comment1 = document.createComment(' Added by p5.start2d.js ');
+    const aw = document.createElement('div');
+    const comment2 = document.createComment(' ---------------------- ');
+
+    let firstChild;
+
+    this._removeComments(document.documentElement);
+
+    firstChild = document.body.childNodes[0];
+
+    aw.id = 'artwork';
+    aw.classList.add('artwork');
+
+    document.body.insertBefore(comment1, firstChild);
+    document.body.insertBefore(aw, firstChild);
+    document.body.insertBefore(comment2, firstChild);
+
+    return aw;
+}
+
+p5.prototype._removeComments = function(node) {
+
+    // ORIGINAL SOURCE:
+    // https://www.sitepoint.com/removing-useless-nodes-from-the-dom/
+
+    for (let n = 0; n < node.childNodes.length; n++) {
+
+        let child = node.childNodes[n];
+
+        if (child.nodeType === Node.COMMENT_NODE) {
+
+            node.removeChild(child);
+            n--;
+
+        } else if (child.nodeType === 1) {
+
+            this._removeComments(child);
+        }
+    }
+}
+
+p5.prototype._setWallpaper = function() {
+
+    if (this._wallpaperImage) {
+
+        const img = new Image();
+
+        img.addEventListener('load', (ev) => {
+
+            this._aw.style.background = `url(${img.src})`;
+
+        }, { once: true });
+
+        img.addEventListener('error', (err) => {
+
+            console.log(`ERROR : Background image "${img.src}" not found`);
+            this._aw.style.background = this._wallpaperColor;
+
+        }, { once: true });
+
+        img.src = this._wallpaperImage;
+
+    } else {
+
+        this._aw.style.background = this._wallpaperColor;
+    }
+}
+
+p5.prototype._initUnitScale = function () {
+
+    if (this._units === 'mm') {
+        this._uMult = this._ppi / 25.4;
+    } else if (this._units === 'cm') {
+        this._uMult = this._ppi / 2.54;
+    } else if (this._units === 'in') {
+        this._uMult = this._ppi;
+    } else {
+        this._uMult = 1;
+    }
+
+    // TODO: test with (U)HD monitor
+    this._unitScale = this._uMult; // * window.devicePixelRatio;
+
+    this._pxWidth = Math.round(this._uWidth * this._uMult);
+    this._pxHeight = Math.round(this._uHeight * this._uMult);
+    this._pxScreenPadding = Math.round(this._toUnits(this._screenPadding, 'px', this._cssScreenPPI));
+}
+
+p5.prototype._initPanZoom = function () {
+
+    const awWidth = this.canvas.parentNode.offsetWidth;
+    const awHeight = this.canvas.parentNode.offsetHeight;
+    const kw = (awWidth - 2 * this._pxScreenPadding) / this._pxWidth;
+    const kh = (awHeight - 2 * this._pxScreenPadding) / this._pxHeight;
+
+    this._minZoomScaled = Math.min(this._minZoom, this._minZoom / this._ppi * this._cssScreenPPI);
+    this._maxZoomScaled = Math.min(this._maxZoom, this._maxZoom / this._ppi * this._cssScreenPPI);
+
+    this._fitZoom = Math.min(this._maxZoomScaled, Math.min(kw, kh));
+    this._minZoomCurrent = this._fitZoom < this._minZoomScaled ? this._fitZoom : this._minZoomCurrent;
+
+    // *** fit if canvas is larger then window. if smaller stay at zoom 1 (one)
+    this._fitZoom = Math.min(1 / this._ppi * this._cssScreenPPI, this._fitZoom);
+
+    // *** always fit; enlarge if canvas is smaller then window
+    // this._maxZoomScaled = Math.max(this._maxZoomScaled, this._fitZoom);
+
+    this._zoom = this._fitZoom;
+
+    this._scaleArtwork();
+    this._positionArtwork();
+}
+
+p5.prototype._scaleArtwork = function () {
+
+    this.canvas.style.width = this._pxWidth * this._zoom + 'px';
+    this.canvas.style.height = this._pxHeight * this._zoom + 'px';
+
+    if (this._shadowVisible) {
+
+        this._drawShadow();
+    }
+}
+
+p5.prototype._positionArtwork = function (left, top) {
+
+    const cvsStyle = this.canvas.style;
+
+    if (!(left || top)) {
+
+        cvsStyle.left = (this._aw.offsetWidth - this._pxWidth * this._zoom) / 2 + 'px';
+        cvsStyle.top = (this._aw.offsetHeight - this._pxHeight * this._zoom) / 2 + 'px';
+
+    } else {
+
+        cvsStyle.left = left + 'px';
+        cvsStyle.top = top + 'px';
+    }
+}
+
+p5.prototype._initListeners = function () {
+
+    const waitForFinalEvent = (() => {
+
+        // ORIGINAL SOURCE :
+        // https://gist.github.com/mazell/289e13ccf01759fcb921
+
+        let timers = {};
+
+        return function (callback, ms, uniqueId) {
+            if (!uniqueId) { uniqueId = 'Don\'t call this twice without a uniqueId'; }
+            if (timers[uniqueId]) { clearTimeout(timers[uniqueId]); }
+            timers[uniqueId] = setTimeout(callback, ms);
+        };
+
+    })();
+
+    window.addEventListener('resize', (ev) => {
+
+        waitForFinalEvent(this._onFinalWindowResize.bind(this), 200, 'unique resize key');
+    });
+
+    this.canvas.addEventListener('mousemove', this._onMouseMove.bind(this));
+    this.canvas.addEventListener('mousedown', this._onMouseDown.bind(this));
+    this.canvas.addEventListener('mouseup', this._onMouseUpOrLeave.bind(this));
+    this.canvas.addEventListener('wheel', this._onMouseWheel.bind(this));
+
+    document.addEventListener('keyup', this._onKeyUp.bind(this));
+}
+
+p5.prototype._onFinalWindowResize = function (ev) {
+
+    this._initPanZoom();
+}
+
+p5.prototype._onMouseMove = function (ev) {
+
+    const rect = this.canvas.getBoundingClientRect();
+    const svgScale = this._pxWidth / rect.width;
+
+    this._mouseX = (ev.clientX - rect.left) * svgScale / this._uMult;
+    this._mouseY = (ev.clientY - rect.top) * svgScale / this._uMult;
+
+    if (this._xyDisplay.style.display === 'block') {
+
+        this._displayCoordinates();
+    }
+}
+
+p5.prototype._displayCoordinates = function () {
+
+    this._xyDisplay.innerHTML =
+        `${this._mouseX.toFixed(this._dispDec)}${this._units} / ` +
+        `${this._mouseY.toFixed(this._dispDec)}${this._units}`;
+}
+
+p5.prototype._onMouseDown = function (ev) {
+
+    this._mouseDown = true;
+
+    this._cvsStartPos = this._getElementPosition(this.canvas);
+    this._mouseStartDragX = ev.clientX;
+    this._mouseStartDragY = ev.clientY;
+
+    this.canvas.addEventListener('mousemove', this._onMouseDragged.bind(this));
+    this.canvas.addEventListener('mouseleave', this._onMouseUpOrLeave.bind(this));
+}
+
+p5.prototype._getElementPosition = function(el) {
+
+    let elDim = window.getComputedStyle(el);
+    let elX = parseFloat(elDim.getPropertyValue('left'));
+    let elY = parseFloat(elDim.getPropertyValue('top'));
+
+    return { x: elX, y: elY };
+}
+
+p5.prototype._onMouseDragged = function (ev) {
+
+    if (this._mouseDown === true) {
+
+        let left = this._cvsStartPos.x + (ev.clientX - this._mouseStartDragX);
+        let top = this._cvsStartPos.y + (ev.clientY - this._mouseStartDragY);
+
+        this._mouseDragging = true;
+
+        this._positionArtwork(left, top);
+    }
+}
+
+p5.prototype._onMouseUpOrLeave = function (ev) {
+
+    if (this._mouseDragging === true) {
+
+        this.canvas.removeEventListener('mousemove', this._onMouseDragged);
+        this.canvas.removeEventListener('mouseleave', this._onMouseUpOrLeave);
+    }
+
+    this._mouseDown = false;
+    this._mouseDragging = false;
+}
+
+p5.prototype._onMouseWheel = function (ev) {
+
+    this._zoomInOut(ev, ev.offsetX, ev.offsetY);
+}
+
+p5.prototype._zoomInOut = function (ev, mX, mY) {
+
+    let cssStyles = window.getComputedStyle(this.canvas);
+    let cvsW = parseFloat(cssStyles.getPropertyValue('width'));
+    let cvsH = parseFloat(cssStyles.getPropertyValue('height'));
+
+    let zoomInc = this._zoomInc;
+    let oldZoom = this._zoom;
+    let pctLeft = mX ? mX / cvsW : undefined;
+    let pctTop = mY ? mY / cvsH : undefined;
+    let pos = this._getElementPosition(this.canvas);
+    let newLeft, newTop;
+
+    if (ev) {
+
+        ev.preventDefault();
+
+        if (ev.ctrlKey) {
+            zoomInc *= 2;
+        }
+
+        if (ev.altKey) {
+            zoomInc *= 0.25;
+        }
+
+        if (ev.deltaY > 0) {
+
+            // zoom out
+
+            if (this._zoom > this._minZoomCurrent) {
+
+                this._zoom = Math.max(this._minZoomCurrent, this._zoom - zoomInc);
+            }
+
+        } else if (ev.deltaY < 0) {
+
+            // zoom in
+
+            if (this._zoom < this._maxZoomScaled) {
+
+                this._zoom = Math.min(this._maxZoomScaled, this._zoom + zoomInc);
+            }
+        }
+    }
+
+    this._scaleArtwork();
+
+    newLeft = pos.x + (this._pxWidth * oldZoom - this._pxWidth * this._zoom) * pctLeft;
+    newTop = pos.y + (this._pxHeight * oldZoom - this._pxHeight * this._zoom) * pctTop;
+    this._positionArtwork(newLeft, newTop);
+}
+
+p5.prototype._onKeyUp = function (ev) {
+
+    // Export drawing to PNG
+    if (ev.key == 'e' || ev.key == 'E') {
+
+        let fullName = this._outputFileName.replace('@date', this._getDateString());
+        fullName = fullName.replace('@seed', this._seed);
+
+        this.save(fullName);
+    }
+
+    // Zoom to (F)it in window
+    if (ev.key == 'f' || ev.key == 'F') {
+
+        this._zoom = this._fitZoom;
+        this._zoomInOut();
+    }
+
+    // Zoom to scale (1)
+    if (ev.key == '1') {
+
+        this._zoom = 1 / this._ppi * this._cssScreenPPI;
+        this._zoomInOut();
+    }
+
+    // Zoom to (M)aximum scale
+    if (ev.key == 'm' || ev.key == 'M') {
+
+        this._zoom = this._maxZoomScaled;
+        this._zoomInOut();
+    }
+
+    // toggle mouse position display
+    if (ev.key == 'd' || ev.key == 'D') {
+
+        if (this._xyDisplay.style.display === 'none') {
+
+            this._xyDisplay.style.display = 'block';
+            this._displayCoordinates();
+
+        } else {
+
+            this._xyDisplay.style.display = 'none';
+        }
+    }
+
+    // toggle shadow visibility
+    if (ev.key === 's' || ev.key === 'S') {
+
+
+        if (this._shadowVisible === true) {
+
+            this._clearShadow();
+            this._shadowVisible = false;
+
+        } else {
+
+            this._drawShadow();
+            this._shadowVisible = true;
+        }
+    }
+}
+
+p5.prototype._getDateString = function() {
+
+    let d = new Date();
+
+    return d.getFullYear() +
+        ('' + (d.getMonth() + 1)).padStart(2, '0') +
+        ('' + d.getDate()).padStart(2, '0') + '-' +
+        ('' + d.getHours()).padStart(2, '0') +
+        ('' + d.getMinutes()).padStart(2, '0') +
+        ('' + d.getSeconds()).padStart(2, '0');
+}
+
+p5.prototype._initShadow = function () {
+
+    if (this._shadowVisible) {
+
+        this._drawShadow();
+    }
+}
+
+p5.prototype._drawShadow = function () {
+
+    const scale = this._ppi / this._cssScreenPPI;
+
+    const u = this._units;
+    const sX = this._shadowX * this._zoom * scale;
+    const sY = this._shadowY * this._zoom * scale;
+    const sBlur = this._shadowBlur * this._zoom * scale;
+
+    this.canvas.style.boxShadow = `${sX}${u} ${sY}${u} ${sBlur}${u} ${this._shadowColor}`;
+}
+
+p5.prototype._clearShadow = function () {
+
+    this.canvas.style.boxShadow = 'none';
+}
+
+p5.prototype._initPositionDisplay = function () {
+
+    this._xyDisplay = document.createElement('div');
+    this._xyDisplay.classList.add('xy-display');
+    this._xyDisplay.style.display = 'block';
+    this._aw.appendChild(this._xyDisplay);
+}
+
+p5.prototype._setGlobalProperties = function () {
+
+    this._setProperty('width', this._uWidth);
+    this._setProperty('height', this._uHeight);
+    this._setProperty('pixelWidth', this._pxWidth);
+    this._setProperty('pixelHeight', this._pxHeight);
+    this._setProperty('units', this._units);
+    this._setProperty('ppi', this._ppi);
 }
