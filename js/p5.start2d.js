@@ -35,7 +35,7 @@
 // CONSTANTS
 // =================================================================================================
 
-const VERSION = '0.4.0';
+const VERSION = '0.4.1';
 
 const ARTWORK_DEFAULTS = {
 
@@ -142,274 +142,287 @@ const PAPER_SIZE = {
 
 // createCanvas
 
-p5.prototype.__createCanvas = p5.prototype.createCanvas;
+p5.prototype.createCanvas = function(originalFunc) {
 
-p5.prototype.createCanvas = function (props = {}) {
-
-    let cvs;
-
-    this._ctx = this._isGlobal ? window : this;
-
-    this._p5StartMode = false;
-
-    if (typeof props === 'object') {
-
-        console.log(`p5.start2d.js v${VERSION}`);
-
-        this._props = { ...ARTWORK_DEFAULTS, ...props };
-
-        this._p5StartMode = true;
-
-        this._units = this._props.units;
-        this._exportPPI = this._props.exportPPI;
-
-        // TODO: test with (U)HD monitor
-        this._dpr = Math.ceil(window.devicePixelRatio) || 1;
-        this._cssScreenPPI = this._props.screenPPI / this._dpr;
-
-        if (typeof this._props.screenPadding === 'number') {
-
-            this._screenPadding = this._props.screenPadding + this._units;
-
-        } else {
-
-            this._screenPadding = this._props.screenPadding;
-        }
-
-        if (typeof this._props.size === 'string') {
-
-            if (this._props.size.toUpperCase() in PAPER_SIZE) {
-
-                this._props.size = PAPER_SIZE[this._props.size.toUpperCase()];
-
+    return function (props = {}) {
+    
+        let cvs;
+    
+        this._ctx = this._isGlobal ? window : this;
+    
+        this._p5StartMode = false;
+    
+        if (typeof props === 'object') {
+    
+            console.log(`p5.start2d.js v${VERSION}`);
+    
+            this._props = { ...ARTWORK_DEFAULTS, ...props };
+    
+            this._p5StartMode = true;
+    
+            this._units = this._props.units;
+            this._exportPPI = this._props.exportPPI;
+    
+            // TODO: test with (U)HD monitor
+            this._dpr = Math.ceil(window.devicePixelRatio) || 1;
+            this._cssScreenPPI = this._props.screenPPI / this._dpr;
+    
+            if (typeof this._props.screenPadding === 'number') {
+    
+                this._screenPadding = this._props.screenPadding + this._units;
+    
             } else {
-
-                console.log(`# WARNING #\ninvalid paper size. Set to default ${ARTWORK_DEFAULTS.size}\n\n`)
-                this._props.size = ARTWORK_DEFAULTS.size;
+    
+                this._screenPadding = this._props.screenPadding;
             }
-        }
-
-        this._uWidth = this._toUnits(this._props.size[0], this._units, this._exportPPI);
-        this._uHeight = this._toUnits(this._props.size[1], this._units, this._exportPPI);
-
-        this._orientation = this._props.orientation;
-
-        if (this._orientation.toLowerCase() === 'portrait') {
-
-            if (this._uWidth > this._uHeight) {
-
-                let tmp = this._uWidth;
-                this._uWidth = this._uHeight;
-                this._uHeight = tmp
+    
+            if (typeof this._props.size === 'string') {
+    
+                if (this._props.size.toUpperCase() in PAPER_SIZE) {
+    
+                    this._props.size = PAPER_SIZE[this._props.size.toUpperCase()];
+    
+                } else {
+    
+                    console.log(`# WARNING #\ninvalid paper size. Set to default ${ARTWORK_DEFAULTS.size}\n\n`)
+                    this._props.size = ARTWORK_DEFAULTS.size;
+                }
             }
-
-        } else if (this._orientation.toLowerCase() === 'landscape') {
-
-            if (this._uWidth < this._uHeight) {
-
-                let tmp = this._uWidth;
-                this._uWidth = this._uHeight;
-                this._uHeight = tmp
+    
+            this._uWidth = this._toUnits(this._props.size[0], this._units, this._exportPPI);
+            this._uHeight = this._toUnits(this._props.size[1], this._units, this._exportPPI);
+    
+            this._orientation = this._props.orientation;
+    
+            if (this._orientation.toLowerCase() === 'portrait') {
+    
+                if (this._uWidth > this._uHeight) {
+    
+                    let tmp = this._uWidth;
+                    this._uWidth = this._uHeight;
+                    this._uHeight = tmp
+                }
+    
+            } else if (this._orientation.toLowerCase() === 'landscape') {
+    
+                if (this._uWidth < this._uHeight) {
+    
+                    let tmp = this._uWidth;
+                    this._uWidth = this._uHeight;
+                    this._uHeight = tmp
+                }
             }
+    
+            this._rndr = props.renderer === null ? this.P2D : props.renderer;
+    
+            this._minZoom = this._props.minZoom;
+            this._minZoomCurrent = this._minZoom;
+            this._maxZoom = this._props.maxZoom;
+            this._zoomInc = this._props.zoomInc;
+    
+            this._shadowVisible = !!this._props.shadowVisible;
+            this._shadowColor = this._props.shadowColor;
+            this._shadowX = this._toUnits(this._props.shadowX, this._units, this._cssScreenPPI);
+            this._shadowY = this._toUnits(this._props.shadowY, this._units, this._cssScreenPPI);
+            this._shadowBlur = this._toUnits(this._props.shadowBlur, this._units, this._cssScreenPPI);
+    
+            this._seed = this._props.seed || Math.floor(Math.random() * (10000 - 1000) + 1000);
+            this._noiseSeed = this._props.noiseSeed || this._seed;
+    
+            this._wallpaperColor = this._props.wallpaperColor;
+            this._wallpaperImage = this._props.wallpaperImage;
+    
+            this._outputFileName = this._props.outputFileName;
+    
+            this._dispDec = this._props.xyDisplayDecimals;
+    
+            // -------------------------------------------------------------------------------------
+    
+            this._aw = null;
+    
+            this._uMult = 0;
+            this._pxWidth = 0;
+            this._pxHeight = 0;
+            this._pxScreenPadding = 0;
+    
+            this._fitZoom = 0;
+            this._zoom = 0;
+    
+            this._cvsStartPos;
+            this._mouseX = 0;
+            this._mouseY = 0;
+            this._mouseStartDragX = 0;
+            this._mouseStartDragY = 0;
+            this._mouseDown = false;
+            this._mouseDragging = false;
+            this._hasMouseFocus = false;
+    
+            this._xyDisplay = null;
+    
+            // -------------------------------------------------------------------------------------
+    
+            this._aw = this._createArtworkParent();
+    
+            this._setWallpaper(this._aw, this._wallpaperImage, this._wallpaperColor);
+    
+            this.randomSeed(this._seed);
+            this.noiseSeed(this._noiseSeed);
+    
+            this._initUnitScale();
+    
+            if (this._rndr === this.WEBGL) {
+    
+                this.noSmooth();
+                this.setAttributes('antialias', true);
+            }
+    
+            cvs = originalFunc.call(this, this._pxWidth, this._pxHeight, this._props.renderer);
+            cvs.parent(this._aw.id);
+            this.canvas.classList.add('canvas');
+    
+            this._initPanZoom();
+            this._initShadow();
+            this._initListeners();
+            this._initPositionDisplay();
+    
+            if (this.drawingContext.imageSmoothingEnabled) {
+    
+                this.drawingContext.imageSmoothingEnabled = true;
+            }
+    
+            if (this.drawingContext.imageSmoothingQuality) {
+    
+                this.drawingContext.imageSmoothingQuality = 'high';
+            }
+    
+            this.noLoop();
+    
+            this._setGlobalProperties();
+    
+            // TODO : test this in setup()
+            this.drawingContext.scale(this._unitScale, this._unitScale);
+    
+            console.log(`width: ${this._uWidth}${this._units} ` +
+                `/ height: ${this._uHeight}${this._units} ` +
+                `/ exportPPI: ${this._exportPPI} / seed: ${this._seed}`);
+    
+        } else {
+    
+            cvs = originalFunc.apply(this, arguments);
         }
-
-        this._rndr = props.renderer === null ? this.P2D : props.renderer;
-
-        this._minZoom = this._props.minZoom;
-        this._minZoomCurrent = this._minZoom;
-        this._maxZoom = this._props.maxZoom;
-        this._zoomInc = this._props.zoomInc;
-
-        this._shadowVisible = !!this._props.shadowVisible;
-        this._shadowColor = this._props.shadowColor;
-        this._shadowX = this._toUnits(this._props.shadowX, this._units, this._cssScreenPPI);
-        this._shadowY = this._toUnits(this._props.shadowY, this._units, this._cssScreenPPI);
-        this._shadowBlur = this._toUnits(this._props.shadowBlur, this._units, this._cssScreenPPI);
-
-        this._seed = this._props.seed || Math.floor(Math.random() * (10000 - 1000) + 1000);
-        this._noiseSeed = this._props.noiseSeed || this._seed;
-
-        this._wallpaperColor = this._props.wallpaperColor;
-        this._wallpaperImage = this._props.wallpaperImage;
-
-        this._outputFileName = this._props.outputFileName;
-
-        this._dispDec = this._props.xyDisplayDecimals;
-
-        // -------------------------------------------------------------------------------------
-
-        this._aw = null;
-
-        this._uMult = 0;
-        this._pxWidth = 0;
-        this._pxHeight = 0;
-        this._pxScreenPadding = 0;
-
-        this._fitZoom = 0;
-        this._zoom = 0;
-
-        this._cvsStartPos;
-        this._mouseX = 0;
-        this._mouseY = 0;
-        this._mouseStartDragX = 0;
-        this._mouseStartDragY = 0;
-        this._mouseDown = false;
-        this._mouseDragging = false;
-        this._hasMouseFocus = false;
-
-        this._xyDisplay = null;
-
-        // -------------------------------------------------------------------------------------
-
-        this._aw = this._createArtworkParent();
-
-        this._setWallpaper(this._aw, this._wallpaperImage, this._wallpaperColor);
-
-        this.randomSeed(this._seed);
-        this.noiseSeed(this._noiseSeed);
-
-        this._initUnitScale();
-
-        if (this._rndr === this.WEBGL) {
-
-            this.noSmooth();
-            this.setAttributes('antialias', true);
-        }
-
-        cvs = this.__createCanvas(this._pxWidth, this._pxHeight, this._props.renderer);
-        cvs.parent(this._aw.id);
-        this.canvas.classList.add('canvas');
-
-        this._initPanZoom();
-        this._initShadow();
-        this._initListeners();
-        this._initPositionDisplay();
-
-        if (this.drawingContext.imageSmoothingEnabled) {
-
-            this.drawingContext.imageSmoothingEnabled = true;
-        }
-
-        if (this.drawingContext.imageSmoothingQuality) {
-
-            this.drawingContext.imageSmoothingQuality = 'high';
-        }
-
-        this.noLoop();
-
-        this._setGlobalProperties();
-
-        // TODO : test this in setup()
-        this.drawingContext.scale(this._unitScale, this._unitScale);
-
-        console.log(`width: ${this._uWidth}${this._units} ` +
-            `/ height: ${this._uHeight}${this._units} ` +
-            `/ exportPPI: ${this._exportPPI} / seed: ${this._seed}`);
-
-    } else {
-
-        cvs = this.__createCanvas.apply(this, arguments);
+    
+        return cvs;
     }
 
-    return cvs;
-}
+}(p5.prototype.createCanvas);
 
 
 // resizeCanvas
 // should you feel the need to cut your canvas in half while painting ;)
 
-p5.prototype.__resizeCanvas = p5.prototype.resizeCanvas;
+p5.prototype.resizeCanvas = function(originalFunc) {
 
-p5.prototype.resizeCanvas = function (w, h, noRedraw) {
+    return function(w, h, noRedraw) {
 
-    if (this._p5StartMode) {
+        if (this._p5StartMode) {
 
-        if (this._seed) {
-            this.randomSeed(this._seed);
+            if (this._seed) {
+                this.randomSeed(this._seed);
+            }
+    
+            if (this._noiseSeed) {
+                this.noiseSeed(this._noiseSeed);
+            }
+    
+            this._uWidth = w;
+            this._uHeight = h;
+    
+            this._pxWidth = Math.floor(this._uWidth * this._uMult);
+            this._pxHeight = Math.floor(this._uHeight * this._uMult);
+    
+            // original.apply(this, [this._pxWidth, this._pxHeight, noRedraw]);
+            originalFunc.call(this, this._pxWidth, this._pxHeight, noRedraw);
+    
+            this._initPanZoom();
+    
+            this._setGlobalProperties();
+    
+            // TODO : test this in setup()
+            this.drawingContext.scale(this._unitScale, this._unitScale);
+    
+            console.log(`width: ${this._uWidth}${this._units} ` +
+                `/ height: ${this._uHeight}${this._units} ` +
+                `/ exportPPI: ${this._exportPPI} / seed: ${this._seed}`);
+    
+        } else {
+    
+            originalFunc.apply(this, arguments);
         }
 
-        if (this._noiseSeed) {
-            this.noiseSeed(this._noiseSeed);
-        }
-
-        this._uWidth = w;
-        this._uHeight = h;
-
-        this._pxWidth = Math.floor(this._uWidth * this._uMult);
-        this._pxHeight = Math.floor(this._uHeight * this._uMult);
-
-        this.__resizeCanvas(this._pxWidth, this._pxHeight, noRedraw);
-
-        this._initPanZoom();
-
-        this._setGlobalProperties();
-
-        // TODO : test this in setup()
-        this.drawingContext.scale(this._unitScale, this._unitScale);
-
-        console.log(`width: ${this._uWidth}${this._units} ` +
-            `/ height: ${this._uHeight}${this._units} ` +
-            `/ exportPPI: ${this._exportPPI} / seed: ${this._seed}`);
-
-    } else {
-
-        this.__resizeCanvas.apply(this, arguments);
     }
 
-}
+}(p5.prototype.resizeCanvas);
 
 
 // resetMatrix
 
-p5.prototype.__resetMatrix = p5.prototype.resetMatrix;
+p5.prototype.resetMatrix = function(originalFunc) {
 
-p5.prototype.resetMatrix = function () {
+    return function() {
 
-    this.__resetMatrix();
+        originalFunc.call(this);
+ 
+        if (this._p5StartMode) {
 
-    if (this._p5StartMode) {
-
-        if (!this._rndr || this._rndr === this.P2D) {
-
-            this.push();
-            this.drawingContext.scale(this._unitScale, this._unitScale);
+            if (!this._rndr || this._rndr === this.P2D) {
+    
+                this.push();
+                this.drawingContext.scale(this._unitScale, this._unitScale);
+            }
+    
+            this._setGlobalProperties();
         }
 
-        this._setGlobalProperties();
     }
-}
+
+}(p5.prototype.resetMatrix);
 
 
 // randomSeed
 
-p5.prototype.__randomSeed = p5.prototype.randomSeed;
+p5.prototype.randomSeed = function (originalFunc) {
 
-p5.prototype.randomSeed = function (seed) {
+    return function(seed) {
 
-    this.__randomSeed(seed);
-
-    if (this._p5StartMode) {
-
-        this._seed = seed;
+        originalFunc.call(this, seed);
+    
+        if (this._p5StartMode) {
+    
+            this._seed = seed;
+        }
     }
-}
+
+}(p5.prototype.randomSeed);
 
 
 // noiseSeed
 
-p5.prototype.__noiseSeed = p5.prototype.noiseSeed;
+p5.prototype.noiseSeed = function (originalFunc) {
 
-p5.prototype.noiseSeed = function (seed) {
+    return function(seed) {
 
-    this.__noiseSeed(seed);
-
-    if (this._p5StartMode) {
-
-        this._noiseSeed = seed;
+        originalFunc.call(this, seed);
+    
+        if (this._p5StartMode) {
+    
+            this._seed = seed;
+        }
     }
-}
 
-// timer
+}(p5.prototype.noiseSeed);
+
+
+// timer (added for testing speed while developing)
 
 p5.prototype.startTimer = function () {
 
