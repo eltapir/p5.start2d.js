@@ -25,7 +25,8 @@
 /* - Panning and zooming                                                                          */
 /* - Easy export to png file                                                                      */
 /*                                                                                                */
-/*   Author  : Kris HEYSE                                                                         */
+/*   Author   : Kris HEYSE                                                                        */
+/*   version  : 0.4.1                                                                             */
 /*                                                                                                */
 /* ********************************************************************************************** */
 

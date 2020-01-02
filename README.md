@@ -151,4 +151,3 @@ To convert PNG files to PDF files I use `imagemagick` (cross platform : linux, m
 ### LICENSE
 
 LGPL2.1, see [LICENSE.txt](LICENSE.txt) for details.
-
