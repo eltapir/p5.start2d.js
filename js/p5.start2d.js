@@ -40,12 +40,12 @@ const VERSION = '0.4.1';
 
 const ARTWORK_DEFAULTS = {
 
-    size: [297, 210],  // array of numbers: ['297mm', '210mm']
+    size: [297, 210],  // array of strings: ['297mm', '210mm']
                        // array of numbers: [297, 210]
                        // string: 'A4', 'A2', 'LETTER', 'ANSIA', ...
     orientation: null, // string: 'portrait', 'landscape' or null
     units: 'mm',       // string: px, mm, cm, in
-    exportPPI: 300,          // number: output/export resolution (pixels per inch)
+    exportPPI: 300,    // number: output/export resolution (pixels per inch)
 
     maxZoom: 2.0,   // number: maximum zoom
     minZoom: 0.2,   // number: minimum zoom => can change to fit sketch on screen
@@ -423,7 +423,7 @@ p5.prototype.noiseSeed = function (originalFunc) {
 }(p5.prototype.noiseSeed);
 
 
-// timer (added for testing speed while developing)
+// timer (added for testing performance while developing)
 
 p5.prototype.startTimer = function () {
 
