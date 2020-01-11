@@ -934,3 +934,4 @@ p5.prototype._setGlobalProperties = function () {
     this._setProperty('units', this._units);
     this._setProperty('exportPPI', this._exportPPI);
 }
+
