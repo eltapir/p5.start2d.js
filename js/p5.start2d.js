@@ -195,7 +195,7 @@ p5.prototype.createCanvas = function(originalFunc) {
     
             this._orientation = this._props.orientation;
     
-            if (this._orientation.toLowerCase() === 'portrait') {
+            if (this._orientation && this._orientation.toLowerCase() === 'portrait') {
     
                 if (this._uWidth > this._uHeight) {
     
@@ -204,7 +204,7 @@ p5.prototype.createCanvas = function(originalFunc) {
                     this._uHeight = tmp
                 }
     
-            } else if (this._orientation.toLowerCase() === 'landscape') {
+            } else if (this._orientation && this._orientation.toLowerCase() === 'landscape') {
     
                 if (this._uWidth < this._uHeight) {
     
