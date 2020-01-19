@@ -12,7 +12,7 @@ Just include p5 and p5.start2d.js in your html file and you are good to go.
 ## Before using this extension, keep in mind that :
 * It is created to use as a quick boilerplate for the creation of sketches which has to be exported.
 * It is only tested in latest chrome / firefox.
-* If p5.js didn't exist I wood never have written this extension.
+* If p5.js didn't exist I would never have written this extension.
 
 ---
 
