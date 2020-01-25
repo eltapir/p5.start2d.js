@@ -1,7 +1,9 @@
 node_modules
 package-lock.json
 
-js/p5.path.js
-js/p5.shaky.js
-
 gitprops.txt
+
+js/p5.path2d.js
+js/canvas.js
+zindex.html
+zartwork.js

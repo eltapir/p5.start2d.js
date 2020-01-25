@@ -285,6 +285,8 @@ p5.prototype.createCanvas = function(originalFunc) {
             this._initShadow();
             this._initListeners();
             this._initPositionDisplay();
+
+            this._displayCoordinates();
     
             if (this.drawingContext.imageSmoothingEnabled) {
     
