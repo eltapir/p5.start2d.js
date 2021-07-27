@@ -156,7 +156,78 @@ p5.prototype.createCanvas = function(originalFunc) {
         if (typeof props === 'object') {
     
             console.log(`p5.start2d.js v${VERSION}`);
+
+            // ADD CSS STYLES
+            // *************************************************************************************
+            // *************************************************************************************
     
+            const style = document.createElement('style');
+
+            style.innerHTML = `
+
+                *,
+                ::after,
+                ::before {
+                    
+                    box-sizing: inherit;
+                    margin: 0;
+                    padding: 0;
+                }
+
+                html {
+                    
+                    box-sizing: border-box;
+                }
+
+                html, body {
+                    
+                    height: 100%;
+                    overflow: hidden;
+                    width: 100%;
+                }
+
+                canvas {
+                    
+                    display: block;
+                    font-size: 0;
+                }
+
+                .artwork {
+
+                    height: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    width: 100%;
+                }
+
+                .canvas {
+
+                    background-color: #fff;
+                    position: absolute;
+                }
+
+                .xy-display {
+
+                    background: rgba(255, 255, 255, 0.5);
+                    border-radius: 1rem;
+                    bottom: 0.5rem;
+                    color: #222;
+                    font-family: monospace;
+                    font-size: 0.8rem;
+                    left: 50%;
+                    padding: 0.25rem 0.5rem;
+                    position: absolute;
+                    text-align: center;
+                    transform: translateX(-50%);
+                }
+
+            `;
+
+            document.head.appendChild(style);
+            
+            // *************************************************************************************
+            // *************************************************************************************
+            
             this._props = { ...ARTWORK_DEFAULTS, ...props };
     
             this._p5StartMode = true;
